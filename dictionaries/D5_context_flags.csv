@@ -1,0 +1,13 @@
+row_type,id,category,name_or_code,description,evidence_type,confirmation_status,source_table,source_ref,version
+CONTEXT_FLAG,F01,base,PRIOR_INPATIENT_ABX,Day 0前の入院抗菌薬（入院治療歴は主集計に加算しない）,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §8 step2, B17 推奨コード例",v1.0-draft
+CONTEXT_FLAG,F02,base,TRANSFERRED_DOCUMENT,外部病院文書の転記（病院原本と転記文書の区別が必要）,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §1/§8, B17 推奨コード例",v1.0-draft
+CONTEXT_FLAG,F03,base,SOURCE_CONFLICT,記録間不一致（病院文書と在宅記録で日付・病名が食い違う場合）,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §8 step6, B17 推奨コード例",v1.0-draft
+CONTEXT_FLAG,F04,base,BASELINE_CARE_PLAN,Day 0時点の看取り方針要確認,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §8 step4, B17 推奨コード例",v1.0-draft
+CONTEXT_FLAG,F05,base,POST_DAY0_CARE_PLAN,Day 0後の方針変更,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §8 step4, B17 推奨コード例",v1.0-draft
+CONTEXT_FLAG,F06,base,LINKAGE_UNVERIFIED,施設横断連結が未確認（患者の同一性確認方法が未確定）,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §10 施設横断照合, B17 推奨コード例",v1.0-draft
+CONTEXT_FLAG,F07,added_v1.0,EPISODE_BOUNDARY_REVIEW,再投与の区切り要確認（episode boundary の臨床確認が必要）,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §5 B17追加コード (v1.0で追加)",v1.0-draft
+CONTEXT_FLAG,F08,added_v1.0,OVERLAPPING_WINDOWS,同一患者の観察期間重複,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §5 B17追加コード (v1.0で追加)",v1.0-draft
+CONTEXT_FLAG,F09,added_v1.0,SAME_DAY_ORDER_UNCLEAR,Day 0同日の投与と転帰の前後関係不明,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §5 B17追加コード (v1.0で追加)",v1.0-draft
+CONTEXT_FLAG,F10,added_v1.0,DUPLICATE_EVENT_SOURCE,同一イベントが複数文書に記録,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §5 B17追加コード (v1.0で追加)",v1.0-draft
+CONTEXT_FLAG,F11,added_v1.0,DATE_PRECISION_LIMITED,日単位で確定できない（月単位等の日付精度の限界）,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §5 B17追加コード (v1.0で追加)",v1.0-draft
+CONTEXT_FLAG,F12,added_v1.0,REGIMEN_OR_ROUTE_CHANGE,併用・薬剤・投与経路変更,manual_review_flag,DRAFT — chưa phê duyệt chính thức,N/A,"CSV Design Guide v1.0 §5 B17追加コード (v1.0で追加)",v1.0-draft

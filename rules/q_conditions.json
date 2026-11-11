@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "title": "Q Conditions — Bộ điều kiện tìm kiếm (Session 04)",
+    "status_doc": "DRAFT — chưa được chủ dự án phê duyệt chính thức",
+    "source_primary": "document/A/AGRI_CARE_後ろ向き集計_マスタードキュメント_v1.0.docx §7, Table 表7-1 và 表7-2",
+    "master_doc_version": "v1.0 (2026-11-02)",
+    "note": "Q01, Q10, Q20, Q30, Q31, Q32, Q40 là định nghĩa CHÍNH THỨC, chép nguyên văn từ 表7-1/7-2, không diễn giải lại. QC1, QC2 là đề xuất MỚI của Session 04 cho tập C (không có trong 表7-1), trạng thái 暫定 (provisional), đã được chủ dự án xác nhận hướng 'giữ cả hai, tách cờ riêng' ngày 2026-11-04.",
+    "generated_by": "Session 04 — Search Logic & Candidate Extraction Design",
+    "generated_at": "2026-11-04"
+  },
+  "official_conditions": [
+    {
+      "id": "Q01",
+      "name_jp": "試行（実施済み）",
+      "name_vn": "Tìm thử (đã thực hiện)",
+      "status": "確定 (đã thực hiện, dùng để tham chiếu/hồi quy)",
+      "condition_original_jp": "病名「肺炎」部分一致 AND 診療行為名「点滴」部分一致。2026年4〜9月、全施設",
+      "condition_vn": "Bệnh danh (disease_name) chứa chuỗi \"肺炎\" (khớp phần) AND tên hành vi điều trị/thuốc (medication_name) chứa chuỗi \"点滴\" (khớp phần). Phạm vi: tháng 4–9/2026, toàn bộ cơ sở.",
+      "output_note_jp": "2,092行。「点滴」は補液を含み絞り込みに効いていない可能性がある（記録のみ）",
+      "output_note_vn": "Kết quả gốc: 2.092 dòng. Lưu ý: từ khóa \"点滴\" bao gồm cả truyền dịch/bù nước (không chỉ kháng sinh) nên có thể không thu hẹp hiệu quả — chỉ dùng để ghi nhận/hồi quy, không dùng làm điều kiện sản xuất.",
+      "role": "Baseline hồi quy (regression fixture), KHÔNG dùng làm pipeline chính thức cho Phase 0.",
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q01"
+    },
+    {
+      "id": "Q10",
+      "name_jp": "呼吸器感染症の病名がある患者",
+      "name_vn": "Bệnh nhân có bệnh danh nhiễm trùng hô hấp (Tập A — Disease)",
+      "status": "確定",
+      "condition_original_jp": "グループ1：検索項目「病名」、表7-2の10語を部分一致でOR",
+      "condition_vn": "Group 1: trường tìm kiếm = \"bệnh danh\" (disease_name). Khớp phần (substring) theo phép OR trên 10 từ khóa của Bảng 7-2 (xem mục search_terms_q10 bên dưới).",
+      "post_processing_jp": "D1を当て、区分PS・PB・PG・PA・PL・PV・LB・Qを残す",
+      "post_processing_vn": "Sau khi khớp từ khóa thô, áp dụng toàn bộ quy trình phân loại D1 (8 modifier M01–M08 rồi 18 category D1-01..D1-18 theo thứ tự); CHỈ giữ lại các bản ghi rơi vào category PS, PB, PG, PA, PL, PV, LB, Q (và chỉ ở trạng thái A hoặc S — H/X bị loại theo quy tắc D1 §3.4/§5.4).",
+      "evidence_table": "disease_records",
+      "match_field": "disease_name (sau chuẩn hóa NFKC)",
+      "level": "record-level (REQ01) — mỗi dòng disease_records được đánh giá độc lập; 'bệnh nhân Q10' = có ≥1 dòng thỏa",
+      "search_terms_q10_source": "Table 7-2 (Master Doc §7) — 10 từ khóa, xem 03_candidate_extraction_algorithm_vn.md mục 2.3 hoặc D1_disease.csv",
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q10 + Table 7-2"
+    },
+    {
+      "id": "Q20",
+      "name_jp": "注射用抗菌薬の記録がある患者",
+      "name_vn": "Bệnh nhân có bản ghi kháng sinh tiêm (Tập B — Injectable Antibiotics)",
+      "status": "確定",
+      "condition_original_jp": "グループ2：検索項目「診療行為名」、D2の検索語89語を部分一致でOR",
+      "condition_vn": "Group 2: trường tìm kiếm = \"tên hành vi điều trị/thuốc\" (medication_name). Khớp phần theo phép OR trên 89 từ khóa D2 (41 thành phần đã xác nhận + 9 thành phần chưa xác nhận = 89 search_term, xem D2_antibiotic.csv).",
+      "post_processing_jp": "「要剤形確認」の検索語でのヒットは名称を確認する",
+      "post_processing_vn": "Các search_term có cảnh báo 'cần xác nhận dạng thuốc' (vd. A03 ユナシン trùng cả dạng uống, A17 ゾシン trùng với 4 thuốc không liên quan) phải được xác nhận lại tên đầy đủ trước khi tính là khớp dương — không tự động chấp nhận.",
+      "evidence_table": "medical_records",
+      "match_field": "medication_name (sau chuẩn hóa NFKC)",
+      "level": "record-level (REQ04) — mỗi dòng medical_records được đánh giá độc lập; 'bệnh nhân Q20' = có ≥1 dòng thỏa",
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q20"
+    },
+    {
+      "id": "Q30",
+      "name_jp": "主候補",
+      "name_vn": "Ứng viên chính (Q10 AND Q20)",
+      "status": "確定",
+      "condition_original_jp": "グループ1（Q10）AND グループ2（Q20）",
+      "condition_vn": "Bệnh nhân vừa thỏa Q10 (≥1 bản ghi bệnh danh hợp lệ) VÀ vừa thỏa Q20 (≥1 bản ghi kháng sinh tiêm) — AND thực hiện ở CẤP BỆNH NHÂN (hai bảng nguồn khác nhau, không có 'bản ghi chung' giữa bệnh danh và thuốc nên AND chỉ có thể là patient-level; đây là tính chất cố hữu của phép giao hai tập theo hai bảng khác nhau, không phải một lựa chọn thiết kế).",
+      "post_processing_jp": "D3で判定コードを付けてレビューに回す",
+      "post_processing_vn": "Với mỗi bệnh nhân thuộc Q30: tra bảng D3 (D1 category × D2 group) để gán mã ưu tiên rà soát A/B/C/X theo APPLY-1..5, rồi đưa vào danh sách rà soát thủ công. KHÔNG tự động coi Q30 là 'đã xác nhận điều trị'.",
+      "important_caveat": "Q30 là TẬP ỨNG VIÊN CHÍNH, KHÔNG PHẢI toàn bộ không gian ứng viên của Phase 0 — các tập A-only/B-only/C-only/Q31/Q32 vẫn phải trích xuất độc lập, không thay bằng điều kiện bắt buộc A AND B AND C (theo yêu cầu rõ của Session 04).",
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q30"
+    },
+    {
+      "id": "Q31",
+      "name_jp": "呼吸器の病名がない抗菌薬投与",
+      "name_vn": "Có kháng sinh tiêm nhưng không có bệnh danh hô hấp khớp (bỏ sót nghi vấn)",
+      "status": "確定 (định nghĩa gốc) — cấp độ loại trừ: xem decision DEC-04-02",
+      "condition_original_jp": "グループ2（Q20）AND グループ1（Q10）に「除外」",
+      "condition_vn": "Mặc định (theo đúng 表7-1, đã xác nhận 2026-11-04): {bệnh nhân thỏa Q20} TRỪ {bệnh nhân thỏa Q10}, tính trên TOÀN BỘ kỳ tìm kiếm (patient-level, giống cách vận hành của tool cũ, xem T08/C02).",
+      "condition_vn_alt": "Chế độ thay thế (tùy chọn, đáp ứng REQ11, PHẢI gắn nhãn rõ khi dùng): thay 'TOÀN BỘ kỳ tìm kiếm' bằng granularity (clinic_id, patient_id, perform_month) — tức chỉ loại các (bệnh nhân × tháng) có Q10 trong CÙNG tháng đó, không loại toàn bộ lịch sử bệnh nhân. Đây là diễn giải mở rộng của Session 04 cho 'cấp bản ghi', vì giữa disease_records và medical_records không có khóa bản ghi chung để loại trừ ở mức dòng thực sự.",
+      "purpose_jp": "病名未登録の呼吸器感染症の見逃し確認（無作為抽出）",
+      "purpose_vn": "Dùng để rà soát ngẫu nhiên xem có bỏ sót bệnh danh hô hấp chưa được ghi nhận/khớp từ điển hay không (phát hiện lỗi dương tính giả âm của D1/Q10).",
+      "evidence_tables": ["medical_records", "disease_records"],
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q31; T08 (Master Doc Table T mục 2); C02 (Master Doc §2)"
+    },
+    {
+      "id": "Q32",
+      "name_jp": "抗菌薬の記録がない呼吸器病名",
+      "name_vn": "Có bệnh danh hô hấp nhưng không có kháng sinh tiêm khớp (rà soát rò từ điển)",
+      "status": "確定 (định nghĩa gốc) — cấp độ loại trừ: xem decision DEC-04-02",
+      "condition_original_jp": "グループ1（Q10）AND グループ2（Q20）に「除外」",
+      "condition_vn": "Mặc định (theo đúng 表7-1): {bệnh nhân thỏa Q10} TRỪ {bệnh nhân thỏa Q20}, patient-level, toàn kỳ tìm kiếm.",
+      "condition_vn_alt": "Chế độ thay thế (tùy chọn, như Q31): granularity theo (clinic_id, patient_id, perform_month).",
+      "purpose_jp": "D2の辞書漏れ確認（無作為抽出）",
+      "purpose_vn": "Dùng để rà soát ngẫu nhiên xem từ điển D2 (89 search_term) có bị rò/thiếu thành phần kháng sinh tiêm nào không.",
+      "evidence_tables": ["medical_records", "disease_records"],
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q32"
+    },
+    {
+      "id": "Q40",
+      "name_jp": "転帰の手掛かり",
+      "name_vn": "Gợi ý dấu hiệu kết cục (chỉ là chỉ dấu, KHÔNG xác nhận outcome)",
+      "status": "確定",
+      "condition_original_jp": "Q30の患者について、診療行為名で表D4-3（P20〜P24）の名称を部分一致でOR",
+      "condition_vn": "Trong phạm vi bệnh nhân thuộc Q30: khớp phần (OR) tên hành vi điều trị (medication_name) với 5 hạng mục billing D4-3 (P20–P24: 往診料, 診療情報提供料(I), 在宅ターミナルケア加算, 看取り加算, 死亡診断加算). P25 ('khoảng trống ghi nhận — không có lượt khám nào sau mốc đó') KHÔNG phải một match-term mà là một rule riêng (kiểm tra absence of record), xem lưu ý.",
+      "important_caveat": "Đây là GỢI Ý/CHỈ DẤU, không phải xác nhận kết cục. Theo CLAUDE.md và Master Doc §6.3: kết cục thật phải xác nhận bằng diễn giải diễn biến/giấy chuyển viện/giấy báo tử qua rà soát thủ công. Không tự động gán outcome=true từ Q40.",
+      "evidence_table": "medical_records",
+      "match_field": "medication_name (sau chuẩn hóa NFKC)",
+      "source": "Master Doc v1.0 §7, Table 7-1, dòng Q40; §6.3, Table D4-3"
+    }
+  ],
+  "proposed_conditions_non_official": [
+    {
+      "id": "QC1",
+      "name_vn": "Tập C — rộng: có thủ thuật tiêm/truyền dịch (bất kỳ loại)",
+      "status": "暫定 (PROVISIONAL) — KHÔNG có trong 表7-1 chính thức. Hướng đã chọn ngày 2026-11-04: giữ cả QC1 và QC2, không gộp một số liệu.",
+      "condition_vn": "Bệnh nhân có ≥1 dòng medical_records với medical_class ∈ {'31','32','33'} (皮下筋肉内注射/静脈内注射/点滴注射 — đã xác nhận bằng số liệu thật ở Session 02), không cần khớp tên thuốc kháng sinh cụ thể (độc lập với Q20).",
+      "evidence_table": "medical_records",
+      "match_field": "medical_class (giá trị 2 ký tự số)",
+      "open_issue": "D4-1 (P01–P11, ORCA manual) định nghĩa phân loại chi tiết hơn bằng mã dạng '.310'..'.350' — CHƯA xác nhận cột nào trong DB giữ mức chi tiết này (kế thừa nghi vấn mở từ Master Doc §10 / D4_procedure.csv). QC1 hiện chỉ dùng được ở mức medical_class 2 chữ số (31/32/33), KHÔNG tách được theo P01–P11 cho đến khi nghi vấn này được đóng.",
+      "source": "Đề xuất Session 04, dựa trên D4-1 (Master Doc §6.1, Table D4-1) + Session 02 xác minh medical_class"
+    },
+    {
+      "id": "QC2",
+      "name_vn": "Tập C — hẹp: khớp hạng mục billing C005-2 (quản lý chỉ đạo truyền dịch tại nhà)",
+      "status": "暫定 (PROVISIONAL) — KHÔNG có trong 表7-1 chính thức.",
+      "condition_vn": "Bệnh nhân có ≥1 dòng medical_records với medication_name khớp (phần) với tên hạng mục billing '在宅患者訪問点滴注射管理指導料' (C005-2).",
+      "evidence_table": "medical_records",
+      "match_field": "medication_name",
+      "open_issue": "Master Doc §6.2 chỉ nêu TÊN QUY ĐỊNH của hạng mục C005-2 (từ bảng điểm y tế), KHÔNG xác nhận chuỗi ký tự thực tế xuất hiện trong medication_name của DB (ORCA có thể viết tắt khác). Chuỗi khớp 'exact' CHƯA được xác minh — phải đối chiếu với dữ liệu thật trước khi dùng cho sản xuất, không tự suy ra cách viết tắt.",
+      "caveat_jp": "指示・算定の記録であり、実際の投与を直接確定しない",
+      "caveat_vn": "Đây là bản ghi chỉ đạo/thanh toán, KHÔNG trực tiếp xác nhận đã thực truyền dịch; chỉ bắt được trường hợp điều dưỡng/y tá thực hiện theo chỉ đạo bác sĩ — bác sĩ tự truyền dịch sẽ KHÔNG xuất hiện trong QC2.",
+      "source": "Đề xuất Session 04, dựa trên D4-2 (Master Doc §6.2, Table D4-2)"
+    }
+  ]
+}
