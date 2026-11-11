@@ -1,0 +1,47 @@
+%% User Flow Diagram — AGRI CARE Cohort Analysis Tool (Session 06, DRAFT)
+%% Phạm vi: chỉ Bước 1-2 của Phase 0 (trích xuất ứng viên + xuất CSV).
+%% Bước 3-4 (rà soát EHR thủ công, xác nhận outcome) nằm NGOÀI tool — chỉ là điểm handoff.
+
+flowchart TD
+    Start([Mở Dashboard]) --> B1[Block 1: Database Overview<br/>Kiểm tra kết nối read-only + độ phủ dữ liệu]
+
+    B1 -->|DB lỗi| ErrStop[Hiển thị lỗi kết nối<br/>Disable toàn bộ block sau]
+    B1 -->|DB OK| B2[Block 2: Data Filters<br/>Chọn facility / kỳ thực hiện / bệnh nhân]
+
+    B2 --> B3[Block 3: Cohort Search<br/>Chọn A/B/C độc lập + Q30/Q31/Q32/Q40/Q01<br/>+ dictionary version + cấp độ loại trừ]
+
+    B3 -->|Nạp điều kiện đã lưu| B3Load[Đọc file điều kiện JSON<br/>REQ09]
+    B3Load --> B3
+
+    B3 -->|CHẠY TÌM KIẾM| Pipeline[[Pipeline Session 04<br/>NFKC normalize → D1/D2 record-level match<br/>→ D3 judge → aggregate patient-level<br/>→ sinh run_id mới]]
+
+    Pipeline --> B4[Block 4: Candidate Statistics<br/>Ma trận 7 ô A/B/C, D3 distribution,<br/>facility distribution NAHT/HOMIS tách riêng,<br/>chỉ dấu dữ liệu chưa xác nhận]
+
+    B4 -->|Lưu điều kiện tìm kiếm hiện tại| SaveQ[Lưu file điều kiện JSON<br/>+ version + ngày + người lưu]
+    SaveQ --> B3
+
+    B4 -->|Xem danh sách ứng viên| B5[Block 5: Candidate List<br/>Lọc theo nguồn/D3/nhóm/review status<br/>ID ẩn danh clinic_id+patient_id]
+
+    B5 -->|Click 1 dòng| B6[Block 6: Patient Detail<br/>Bằng chứng bệnh danh / thuốc / thủ thuật<br/>Record-level evidence_id]
+
+    B6 -->|Cập nhật review status| UpdReview[Ghi nhận review_status<br/>Chưa rà soát / Đang rà soát / Đã rà soát<br/>KHÔNG suy ra kết luận lâm sàng]
+    UpdReview --> B5
+
+    B6 -->|Xuất evidence 1 bệnh nhân| B7
+    B5 -->|⬇ Xuất CSV theo bộ lọc hiện tại| B7[Block 7: Export<br/>Candidate CSV / Evidence CSV /<br/>Review CSV Template / Search Metadata]
+
+    B7 --> CheckS05{Session 05<br/>CSV spec đã có?}
+    CheckS05 -->|Chưa| WarnS05[Banner: DRAFT, chờ đối chiếu Session 05]
+    CheckS05 -->|Đã có| B7
+
+    WarnS05 --> Download[Tải file CSV/JSON<br/>kèm metadata tái lập REQ09]
+    B7 --> Download
+
+    Download --> Handoff[[Handoff NGOÀI TOOL:<br/>Bước 3 - Rà soát EHR thủ công<br/>Bước 4 - Xác nhận outcome 30 ngày<br/>Thực hiện bởi con người, không tự động]]
+
+    classDef pipeline fill:#eef,stroke:#88a;
+    classDef handoff fill:#fee,stroke:#a88;
+    classDef warn fill:#ffd,stroke:#aa8;
+    class Pipeline pipeline
+    class Handoff handoff
+    class ErrStop,WarnS05 warn

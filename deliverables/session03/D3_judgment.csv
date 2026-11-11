@@ -1,0 +1,73 @@
+﻿row_type,key1,key2,value_or_code,description,status,source_table,source_ref,version
+ANTIBIOTIC_GROUP,G1,,在宅で使いやすい第一候補（1日1回投与）,成分ID: A01,確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+ANTIBIOTIC_GROUP,G2a,,肺炎の経験的治療で用いるβラクタム系,"成分ID: A02, A03, A04, A05",確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+ANTIBIOTIC_GROUP,G2b,,非定型病原体にも有効な薬,"成分ID: A06, A07, A08, A09, A10",確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+ANTIBIOTIC_GROUP,G3,,嫌気性菌を主な標的とする薬,"成分ID: A11, A12, A13, A14, A15",確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+ANTIBIOTIC_GROUP,G4,,広域・抗緑膿菌・耐性菌用,成分ID: A16〜A33（A31を除く）、U01〜U06,確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+ANTIBIOTIC_GROUP,G5,,抗MRSA薬,成分ID: A34〜A37、U07,確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+ANTIBIOTIC_GROUP,G6,,呼吸器感染症の経験的治療に通常用いない,"成分ID: A31, A38, A39, A40, A41, U08, U09",確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
+JUDGMENT_CODE,A,,優先確定レビュー,診療録で確定エピソードかを最優先で判定する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
+JUDGMENT_CODE,B,,確定レビュー（追加確認あり）,重症度・耐性菌・合併感染・病型を確認して判定する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
+JUDGMENT_CODE,C,,低優先レビュー,他部位感染や他目的の投与の可能性が高い。件数が多い場合は無作為抽出で確認する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
+JUDGMENT_CODE,X,,呼吸器感染症の根拠なし,主解析の候補にしない。見逃し評価のために一定数を無作為抽出して確認する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
+MATRIX_CELL,PS・PB・PG,G1,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PS・PB・PG,G2a,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PS・PB・PG,G2b,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PS・PB・PG,G3,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PS・PB・PG,G4,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PS・PB・PG,G5,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PS・PB・PG,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G1,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G2a,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G2b,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G3,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G4,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G5,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PA,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G1,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G2a,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G2b,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G3,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G4,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G5,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PL,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G1,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G2a,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G2b,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G3,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G4,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G5,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,PV,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G1,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G2a,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G2b,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G3,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G4,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G5,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,LB,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G1,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G2a,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G2b,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G3,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G4,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G5,B,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,Q,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G1,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G2a,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G2b,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G3,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G4,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G5,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,UR・VI・BIのみ,G6,C,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G1,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G2a,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G2b,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G3,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G4,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G5,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+MATRIX_CELL,呼吸器感染症の病名なし,G6,X,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
+APPLICATION_RULE,APPLY-1,,,病名はD1で状態がA・Sのものだけを使う。区分ごとに、状態Sの病名しかない場合はコードを1段階下げる（A→B、B→C、C→C）。,確定,5.4,Master Doc v1.0 §5.4,v1.0
+APPLICATION_RULE,APPLY-2,,,1人（1エピソード）に複数の病名区分・複数の成分がある場合は、すべての組合せのうち最も優先度の高いコードを採る（A＞B＞C＞X）。,確定,5.4,Master Doc v1.0 §5.4,v1.0
+APPLICATION_RULE,APPLY-3,,,区分UR・VI・BIの病名しかない場合は「UR・VI・BIのみ」の行を使う。区分N・T・F・K・R・Z・Oの病名しかない場合は「呼吸器感染症の病名なし」の行を使う。,確定,5.4,Master Doc v1.0 §5.4,v1.0
+APPLICATION_RULE,APPLY-4,,,区分Oの病名（状態A・S）が同時にある場合は「競合あり」のフラグを付ける。フラグはコードを変えないが、レビューで投与目的を必ず確認する。,確定,5.4,Master Doc v1.0 §5.4,v1.0
+APPLICATION_RULE,APPLY-5,,,現行ツールでは病名と投与の時期の一致を確認できない（C01・C03）。時期の確認は診療録レビューで行う。,確定,5.4,Master Doc v1.0 §5.4,v1.0

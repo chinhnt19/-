@@ -1,0 +1,102 @@
+seq,scenario_type,input_medication_name_synthetic,expected_matched_q20,expected_search_term,expected_ingredient_id,expected_confirmed_status,expected_group,expected_needs_form_check,notes
+1,POSITIVE_EXACT_TERM,セフトリアキソン1g,Y,セフトリアキソン,A01,確認済,G1,N,D2_antibiotic.csv row search_term='セフトリアキソン' ingredient=A01
+2,POSITIVE_EXACT_TERM,ロセフィン1g,Y,ロセフィン,A01,確認済,G1,N,D2_antibiotic.csv row search_term='ロセフィン' ingredient=A01
+3,POSITIVE_EXACT_TERM,セフォタキシム1g,Y,セフォタキシム,A02,確認済,G2a,N,D2_antibiotic.csv row search_term='セフォタキシム' ingredient=A02
+4,POSITIVE_EXACT_TERM,セフォタックス1g,Y,セフォタックス,A02,確認済,G2a,N,D2_antibiotic.csv row search_term='セフォタックス' ingredient=A02
+5,POSITIVE_EXACT_TERM,クラフォラン1g,Y,クラフォラン,A02,確認済,G2a,N,D2_antibiotic.csv row search_term='クラフォラン' ingredient=A02
+6,POSITIVE_EXACT_TERM,ユナシン1g,Y,ユナシン,A03,確認済,G2a,N,D2_antibiotic.csv row search_term='ユナシン' ingredient=A03
+7,POSITIVE_EXACT_TERM,ユナスピン1g,Y,ユナスピン,A03,確認済,G2a,N,D2_antibiotic.csv row search_term='ユナスピン' ingredient=A03
+8,POSITIVE_EXACT_TERM,スルバシリン1g,Y,スルバシリン,A03,確認済,G2a,N,D2_antibiotic.csv row search_term='スルバシリン' ingredient=A03
+9,POSITIVE_EXACT_TERM,ピシリバクタ1g,Y,ピシリバクタ,A03,確認済,G2a,N,D2_antibiotic.csv row search_term='ピシリバクタ' ingredient=A03
+10,POSITIVE_EXACT_TERM,ビクシリン注射用1g,Y,ビクシリン注射用,A04,確認済,G2a,N,D2_antibiotic.csv row search_term='ビクシリン注射用' ingredient=A04
+11,POSITIVE_EXACT_TERM,注射用ペニシリン1g,Y,注射用ペニシリン,A05,確認済,G2a,N,D2_antibiotic.csv row search_term='注射用ペニシリン' ingredient=A05
+12,POSITIVE_EXACT_TERM,クラビット点滴1g,Y,クラビット点滴,A06,確認済,G2b,N,D2_antibiotic.csv row search_term='クラビット点滴' ingredient=A06
+13,POSITIVE_EXACT_TERM,レボフロキサシン点滴1g,Y,レボフロキサシン点滴,A06,確認済,G2b,N,D2_antibiotic.csv row search_term='レボフロキサシン点滴' ingredient=A06
+14,POSITIVE_EXACT_TERM,ラスビック点滴1g,Y,ラスビック点滴,A07,確認済,G2b,N,D2_antibiotic.csv row search_term='ラスビック点滴' ingredient=A07
+15,POSITIVE_EXACT_TERM,ジスロマック点滴1g,Y,ジスロマック点滴,A08,確認済,G2b,N,D2_antibiotic.csv row search_term='ジスロマック点滴' ingredient=A08
+16,POSITIVE_EXACT_TERM,エリスロシン点滴1g,Y,エリスロシン点滴,A09,確認済,G2b,N,D2_antibiotic.csv row search_term='エリスロシン点滴' ingredient=A09
+17,POSITIVE_EXACT_TERM,ミノサイクリン塩酸塩点滴1g,Y,ミノサイクリン塩酸塩点滴,A10,確認済,G2b,N,D2_antibiotic.csv row search_term='ミノサイクリン塩酸塩点滴' ingredient=A10
+18,POSITIVE_EXACT_TERM,ミノマイシン点滴1g,Y,ミノマイシン点滴,A10,確認済,G2b,N,D2_antibiotic.csv row search_term='ミノマイシン点滴' ingredient=A10
+19,POSITIVE_EXACT_TERM,セフメタゾ1g,Y,セフメタゾ,A11,確認済,G3,N,D2_antibiotic.csv row search_term='セフメタゾ' ingredient=A11
+20,POSITIVE_EXACT_TERM,フロモキセフ1g,Y,フロモキセフ,A12,確認済,G3,N,D2_antibiotic.csv row search_term='フロモキセフ' ingredient=A12
+21,POSITIVE_EXACT_TERM,フルマリン1g,Y,フルマリン,A12,確認済,G3,N,D2_antibiotic.csv row search_term='フルマリン' ingredient=A12
+22,POSITIVE_EXACT_TERM,ラタモキセフ1g,Y,ラタモキセフ,A13,確認済,G3,N,D2_antibiotic.csv row search_term='ラタモキセフ' ingredient=A13
+23,POSITIVE_EXACT_TERM,シオマリン1g,Y,シオマリン,A13,確認済,G3,N,D2_antibiotic.csv row search_term='シオマリン' ingredient=A13
+24,POSITIVE_EXACT_TERM,クリンダマイシンリン酸エステル注1g,Y,クリンダマイシンリン酸エステル注,A14,確認済,G3,N,D2_antibiotic.csv row search_term='クリンダマイシンリン酸エステル注' ingredient=A14
+25,POSITIVE_EXACT_TERM,ダラシン1g,Y,ダラシン,A14,確認済,G3,N,D2_antibiotic.csv row search_term='ダラシン' ingredient=A14
+26,POSITIVE_EXACT_TERM,アネメトロ1g,Y,アネメトロ,A15,確認済,G3,N,D2_antibiotic.csv row search_term='アネメトロ' ingredient=A15
+27,POSITIVE_EXACT_TERM,ピペラシリン1g,Y,ピペラシリン,A16,確認済,G4,N,D2_antibiotic.csv row search_term='ピペラシリン' ingredient=A16
+28,POSITIVE_EXACT_TERM,ペントシリン1g,Y,ペントシリン,A16,確認済,G4,N,D2_antibiotic.csv row search_term='ペントシリン' ingredient=A16
+29,POSITIVE_EXACT_TERM,ゾシン静注1g,Y,ゾシン静注,A17,確認済,G4,N,D2_antibiotic.csv row search_term='ゾシン静注' ingredient=A17
+30,POSITIVE_EXACT_TERM,ゾシン配合点滴1g,Y,ゾシン配合点滴,A17,確認済,G4,N,D2_antibiotic.csv row search_term='ゾシン配合点滴' ingredient=A17
+31,POSITIVE_EXACT_TERM,タゾピペ1g,Y,タゾピペ,A17,確認済,G4,N,D2_antibiotic.csv row search_term='タゾピペ' ingredient=A17
+32,POSITIVE_EXACT_TERM,セフタジジム1g,Y,セフタジジム,A18,確認済,G4,N,D2_antibiotic.csv row search_term='セフタジジム' ingredient=A18
+33,POSITIVE_EXACT_TERM,モダシン1g,Y,モダシン,A18,確認済,G4,N,D2_antibiotic.csv row search_term='モダシン' ingredient=A18
+34,POSITIVE_EXACT_TERM,セフェピム1g,Y,セフェピム,A19,確認済,G4,N,D2_antibiotic.csv row search_term='セフェピム' ingredient=A19
+35,POSITIVE_EXACT_TERM,マキシピーム1g,Y,マキシピーム,A19,確認済,G4,N,D2_antibiotic.csv row search_term='マキシピーム' ingredient=A19
+36,POSITIVE_EXACT_TERM,スルペラゾン1g,Y,スルペラゾン,A20,確認済,G4,N,D2_antibiotic.csv row search_term='スルペラゾン' ingredient=A20
+37,POSITIVE_EXACT_TERM,ワイスタール1g,Y,ワイスタール,A20,確認済,G4,N,D2_antibiotic.csv row search_term='ワイスタール' ingredient=A20
+38,POSITIVE_EXACT_TERM,セフォセフ1g,Y,セフォセフ,A20,確認済,G4,N,D2_antibiotic.csv row search_term='セフォセフ' ingredient=A20
+39,POSITIVE_EXACT_TERM,バクフォーゼ1g,Y,バクフォーゼ,A20,確認済,G4,N,D2_antibiotic.csv row search_term='バクフォーゼ' ingredient=A20
+40,POSITIVE_EXACT_TERM,メロペネム1g,Y,メロペネム,A21,確認済,G4,N,D2_antibiotic.csv row search_term='メロペネム' ingredient=A21
+41,POSITIVE_EXACT_TERM,メロペン1g,Y,メロペン,A21,確認済,G4,N,D2_antibiotic.csv row search_term='メロペン' ingredient=A21
+42,POSITIVE_EXACT_TERM,チエナム1g,Y,チエナム,A22,確認済,G4,N,D2_antibiotic.csv row search_term='チエナム' ingredient=A22
+43,POSITIVE_EXACT_TERM,チエクール1g,Y,チエクール,A22,確認済,G4,N,D2_antibiotic.csv row search_term='チエクール' ingredient=A22
+44,POSITIVE_EXACT_TERM,レカルブリオ1g,Y,レカルブリオ,A23,確認済,G4,N,D2_antibiotic.csv row search_term='レカルブリオ' ingredient=A23
+45,POSITIVE_EXACT_TERM,オメガシン1g,Y,オメガシン,A24,確認済,G4,N,D2_antibiotic.csv row search_term='オメガシン' ingredient=A24
+46,POSITIVE_EXACT_TERM,アズトレオナム1g,Y,アズトレオナム,A25,確認済,G4,N,D2_antibiotic.csv row search_term='アズトレオナム' ingredient=A25
+47,POSITIVE_EXACT_TERM,アザクタム1g,Y,アザクタム,A25,確認済,G4,N,D2_antibiotic.csv row search_term='アザクタム' ingredient=A25
+48,POSITIVE_EXACT_TERM,シプロキサン注1g,Y,シプロキサン注,A26,確認済,G4,N,D2_antibiotic.csv row search_term='シプロキサン注' ingredient=A26
+49,POSITIVE_EXACT_TERM,シプロフロキサシン点滴1g,Y,シプロフロキサシン点滴,A26,確認済,G4,N,D2_antibiotic.csv row search_term='シプロフロキサシン点滴' ingredient=A26
+50,POSITIVE_EXACT_TERM,パシル点滴1g,Y,パシル点滴,A27,確認済,G4,N,D2_antibiotic.csv row search_term='パシル点滴' ingredient=A27
+51,POSITIVE_EXACT_TERM,パズクロス点滴1g,Y,パズクロス点滴,A27,確認済,G4,N,D2_antibiotic.csv row search_term='パズクロス点滴' ingredient=A27
+52,POSITIVE_EXACT_TERM,ゲンタシン注1g,Y,ゲンタシン注,A28,確認済,G4,N,D2_antibiotic.csv row search_term='ゲンタシン注' ingredient=A28
+53,POSITIVE_EXACT_TERM,ゲンタマイシン硫酸塩注1g,Y,ゲンタマイシン硫酸塩注,A28,確認済,G4,N,D2_antibiotic.csv row search_term='ゲンタマイシン硫酸塩注' ingredient=A28
+54,POSITIVE_EXACT_TERM,トブラシン注1g,Y,トブラシン注,A29,確認済,G4,N,D2_antibiotic.csv row search_term='トブラシン注' ingredient=A29
+55,POSITIVE_EXACT_TERM,アミカシン硫酸塩注1g,Y,アミカシン硫酸塩注,A30,確認済,G4,N,D2_antibiotic.csv row search_term='アミカシン硫酸塩注' ingredient=A30
+56,POSITIVE_EXACT_TERM,ホスホマイシンナトリウム静注1g,Y,ホスホマイシンナトリウム静注,A31,確認済,G6,N,D2_antibiotic.csv row search_term='ホスホマイシンナトリウム静注' ingredient=A31
+57,POSITIVE_EXACT_TERM,ホスホマイシンNa静注1g,Y,ホスホマイシンNa静注,A31,確認済,G6,N,D2_antibiotic.csv row search_term='ホスホマイシンNa静注' ingredient=A31
+58,POSITIVE_EXACT_TERM,ホスミシン1g,Y,ホスミシン,A31,確認済,G6,N,D2_antibiotic.csv row search_term='ホスミシン' ingredient=A31
+59,POSITIVE_EXACT_TERM,ザバクサ1g,Y,ザバクサ,A32,確認済,G4,N,D2_antibiotic.csv row search_term='ザバクサ' ingredient=A32
+60,POSITIVE_EXACT_TERM,ザビセフタ1g,Y,ザビセフタ,A33,確認済,G4,N,D2_antibiotic.csv row search_term='ザビセフタ' ingredient=A33
+61,POSITIVE_EXACT_TERM,バンコマイシン塩酸塩点滴1g,Y,バンコマイシン塩酸塩点滴,A34,確認済,G5,N,D2_antibiotic.csv row search_term='バンコマイシン塩酸塩点滴' ingredient=A34
+62,POSITIVE_EXACT_TERM,塩酸バンコマイシン点滴1g,Y,塩酸バンコマイシン点滴,A34,確認済,G5,N,D2_antibiotic.csv row search_term='塩酸バンコマイシン点滴' ingredient=A34
+63,POSITIVE_EXACT_TERM,バンコマイシン点滴1g,Y,バンコマイシン点滴,A34,確認済,G5,N,D2_antibiotic.csv row search_term='バンコマイシン点滴' ingredient=A34
+64,POSITIVE_EXACT_TERM,テイコプラニン1g,Y,テイコプラニン,A35,確認済,G5,N,D2_antibiotic.csv row search_term='テイコプラニン' ingredient=A35
+65,POSITIVE_EXACT_TERM,タゴシッド1g,Y,タゴシッド,A35,確認済,G5,N,D2_antibiotic.csv row search_term='タゴシッド' ingredient=A35
+66,POSITIVE_EXACT_TERM,ザイボックス注1g,Y,ザイボックス注,A36,確認済,G5,N,D2_antibiotic.csv row search_term='ザイボックス注' ingredient=A36
+67,POSITIVE_EXACT_TERM,リネゾリド点滴1g,Y,リネゾリド点滴,A36,確認済,G5,N,D2_antibiotic.csv row search_term='リネゾリド点滴' ingredient=A36
+68,POSITIVE_EXACT_TERM,アルベカシン1g,Y,アルベカシン,A37,確認済,G5,N,D2_antibiotic.csv row search_term='アルベカシン' ingredient=A37
+69,POSITIVE_EXACT_TERM,ハベカシン1g,Y,ハベカシン,A37,確認済,G5,N,D2_antibiotic.csv row search_term='ハベカシン' ingredient=A37
+70,POSITIVE_EXACT_TERM,ダプトマイシン1g,Y,ダプトマイシン,A38,確認済,G6,N,D2_antibiotic.csv row search_term='ダプトマイシン' ingredient=A38
+71,POSITIVE_EXACT_TERM,キュビシン1g,Y,キュビシン,A38,確認済,G6,N,D2_antibiotic.csv row search_term='キュビシン' ingredient=A38
+72,POSITIVE_EXACT_TERM,セファゾリン1g,Y,セファゾリン,A39,確認済,G6,N,D2_antibiotic.csv row search_term='セファゾリン' ingredient=A39
+73,POSITIVE_EXACT_TERM,セファメジン1g,Y,セファメジン,A39,確認済,G6,N,D2_antibiotic.csv row search_term='セファメジン' ingredient=A39
+74,POSITIVE_EXACT_TERM,セフォチアム塩酸塩静注1g,Y,セフォチアム塩酸塩静注,A40,確認済,G6,N,D2_antibiotic.csv row search_term='セフォチアム塩酸塩静注' ingredient=A40
+75,POSITIVE_EXACT_TERM,セフォチアム静注1g,Y,セフォチアム静注,A40,確認済,G6,N,D2_antibiotic.csv row search_term='セフォチアム静注' ingredient=A40
+76,POSITIVE_EXACT_TERM,パンスポリン静注1g,Y,パンスポリン静注,A40,確認済,G6,N,D2_antibiotic.csv row search_term='パンスポリン静注' ingredient=A40
+77,POSITIVE_EXACT_TERM,パンスポリン筋注1g,Y,パンスポリン筋注,A40,確認済,G6,N,D2_antibiotic.csv row search_term='パンスポリン筋注' ingredient=A40
+78,POSITIVE_EXACT_TERM,注射用ビクシリン1g,Y,注射用ビクシリン,A41,確認済,G6,N,D2_antibiotic.csv row search_term='注射用ビクシリン' ingredient=A41
+79,POSITIVE_EXACT_TERM,セフォゾプラン1g,Y,セフォゾプラン,U01,未確認,G4,N,D2_antibiotic.csv row search_term='セフォゾプラン' ingredient=U01
+80,POSITIVE_EXACT_TERM,ファーストシン1g,Y,ファーストシン,U01,未確認,G4,N,D2_antibiotic.csv row search_term='ファーストシン' ingredient=U01
+81,POSITIVE_EXACT_TERM,ドリペネム1g,Y,ドリペネム,U02,未確認,G4,N,D2_antibiotic.csv row search_term='ドリペネム' ingredient=U02
+82,POSITIVE_EXACT_TERM,フィニバックス1g,Y,フィニバックス,U02,未確認,G4,N,D2_antibiotic.csv row search_term='フィニバックス' ingredient=U02
+83,POSITIVE_EXACT_TERM,カルベニン1g,Y,カルベニン,U03,未確認,G4,N,D2_antibiotic.csv row search_term='カルベニン' ingredient=U03
+84,POSITIVE_EXACT_TERM,フェトロージャ1g,Y,フェトロージャ,U04,未確認,G4,N,D2_antibiotic.csv row search_term='フェトロージャ' ingredient=U04
+85,POSITIVE_EXACT_TERM,オルドレブ1g,Y,オルドレブ,U05,未確認,G4,N,D2_antibiotic.csv row search_term='オルドレブ' ingredient=U05
+86,POSITIVE_EXACT_TERM,タイガシル1g,Y,タイガシル,U06,未確認,G4,N,D2_antibiotic.csv row search_term='タイガシル' ingredient=U06
+87,POSITIVE_EXACT_TERM,シベクトロ点滴1g,Y,シベクトロ点滴,U07,未確認,G5,N,D2_antibiotic.csv row search_term='シベクトロ点滴' ingredient=U07
+88,POSITIVE_EXACT_TERM,バクトラミン注1g,Y,バクトラミン注,U08,未確認,G6,N,D2_antibiotic.csv row search_term='バクトラミン注' ingredient=U08
+89,POSITIVE_EXACT_TERM,リンコシン注1g,Y,リンコシン注,U09,未確認,G6,N,D2_antibiotic.csv row search_term='リンコシン注' ingredient=U09
+90,NEGATIVE_COLLISION_DRUG,ドキサゾシンメシル酸塩錠2mg,N,,,,,N,"Phải KHÔNG khớp A17 dù chứa chuỗi 'ゾシン' là hậu tố của tên thuốc này — vì search_term thật của A17 là 'ゾシン静注'/'ゾシン配合点滴'/'タゾピペ' (đã gắn từ dạng thuốc theo K3/K4), không phải 'ゾシン' trần. Test trực tiếp quy tắc C05/K4."
+91,NEGATIVE_COLLISION_DRUG,テラゾシン塩酸塩錠1mg,N,,,,,N,"Tương tự — thuốc hạ áp, không phải kháng sinh. Không được khớp A17."
+92,NEGATIVE_COLLISION_DRUG,プラゾシン塩酸塩錠0.5mg,N,,,,,N,Tương tự nhóm 4 thuốc collision (ドキサゾシン/テラゾシン/プラゾシン/ブナゾシン) nêu ở D2_antibiotic.csv ghi chú A17.
+93,NEGATIVE_COLLISION_DRUG,ブナゾシン塩酸塩錠3mg,N,,,,,N,"Tương tự — thuốc nhỏ mắt/hạ áp, không phải kháng sinh tiêm."
+94,NEGATIVE_BARE_TERM_NOT_IN_DICT,ゾシン,N,,,,,N,"Chuỗi 'ゾシン' trần (không có hậu tố 静注/配合点滴) KHÔNG phải 1 trong 89 search_term thật — thuật toán match_d2 kiểm tra 'search_term in medication_name_norm' (search_term phải là substring của tên DB), không phải chiều ngược lại. Vì search_term A17 luôn có hậu tố dạng thuốc, chuỗi DB='ゾシン' đơn thuần sẽ KHÔNG chứa 'ゾシン静注' như substring -> không khớp. Test này xác nhận hướng substring đúng chiều, tránh lỗi test ngược (false positive nếu code viết nhầm 'medication_name_norm in search_term')."
+95,POSITIVE_FORM_SUFFIX_OK,ゾシン静注用4.5「サワイ」,Y,ゾシン静注,A17,確認済,G4,N,Khớp đúng vì DB value chứa đủ search_term 'ゾシン静注' (bao gồm hậu tố dạng thuốc theo K3).
+96,POSITIVE_NEEDS_FORM_CHECK_ORAL_FALSE_SHAPE,ユナシン細粒小児用10%,Y,ユナシン,A03,確認済,G2a,Y,"A03 'ユナシン' khớp dương nhưng ĐÂY LÀ DẠNG UỐNG (細粒 = hạt uống) — đúng cảnh báo ghi trong D2_antibiotic.csv: 'ユナシン' trùng cả dạng uống. needs_form_check=Y bắt buộc; KHÔNG được tự động coi là tiêm (Master Doc Q20 post-processing). Test xác nhận hệ thống KHÔNG tự loại (vẫn giữ Y + cờ), và KHÔNG tự chấp nhận là tiêm — chỉ gắn cờ chờ xác nhận thủ công."
+97,POSITIVE_NEEDS_FORM_CHECK_ORAL_FALSE_SHAPE,ダラシンカプセル75mg,Y,ダラシン,A14,確認済,G3,Y,"A14 'ダラシン' khớp dương nhưng là dạng uống (カプセル). needs_form_check=Y, tương tự trên."
+98,POSITIVE_NEEDS_FORM_CHECK_ORAL_FALSE_SHAPE,ホスミシンドライシロップ400,Y,ホスミシン,A31,確認済,G6,Y,"A31 'ホスミシン' khớp dương nhưng là dạng uống bột (ドライシロップ, thành phần khác là ホスホマイシンカルシウム theo ghi chú D2). needs_form_check=Y."
+99,NFKC_FULLWIDTH_ALNUM_NO_IMPACT,セフトリアキソンＮａ注射用１ｇ「サワイ」,Y,セフトリアキソン,A01,確認済,G1,N,"Chuỗi DB chứa ký tự toàn độ rộng 'Ｎａ'/'１ｇ' không liên quan tới search_term (search_term 'セフトリアキソン' không chứa số/chữ Latin theo quy tắc K2) — khớp đúng bất kể NFKC có áp dụng hay không trên phần số/chữ đó. Test hồi quy xác nhận K2 (không đưa chữ Latin vào search_term) giúp D2 miễn nhiễm với lỗi toàn/bán độ rộng C06, khác hẳn D1 (nơi NFKC có ảnh hưởng thật, xem ví dụ ＣＯＶＩＤ−１９ trong 02_expected_result_dataset_disease_d1.csv)."
+100,NEGATIVE_NO_MATCH_UNRELATED_DRUG,ロキソプロフェンナトリウム錠60mg,N,,,,,N,"Thuốc giảm đau NSAID, không thuộc D2. Phải trả về N cho toàn bộ 89 search_term."
+101,NEGATIVE_NO_MATCH_SALINE_INFUSION,生理食塩液500mL,N,,,,,N,"Truyền dịch/bù nước không chứa kháng sinh — liên quan QC1 (medical_class) KHÔNG liên quan Q20/D2. Test ranh giới giữa D2 (Q20, cụ thể tên kháng sinh) và QC1 (D4-1, nhóm tiêm chung) không bị lẫn vào nhau."

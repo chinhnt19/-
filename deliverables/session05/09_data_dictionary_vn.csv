@@ -1,0 +1,139 @@
+csv_file,column_name,data_type,controlled_vocabulary_or_format,missing_value_convention,description_vn,rule_reference
+03_candidate_csv_template.csv,run_id,string,"{YYYYMMDD}-{HHMMSS}-{hash}",none,ID lượt trích xuất; snapshot mới mỗi lần chạy,Session05 §3.3
+03_candidate_csv_template.csv,run_date,date,YYYY-MM-DD,none,Ngày thực hiện lượt trích xuất,REQ09
+03_candidate_csv_template.csv,db_fetched_at_naht,string,"min/max ISO date",NA nếu nhóm NAHT rỗng trong scope,Khoảng thời gian crawl DB nhóm NAHT dùng cho run này,Session02 §6.5
+03_candidate_csv_template.csv,db_fetched_at_homis,string,"min/max ISO date",NA nếu nhóm HOMIS rỗng trong scope,Khoảng thời gian crawl DB nhóm HOMIS dùng cho run này,Session02 §6.5
+03_candidate_csv_template.csv,q_table_version,string,vd v1.0,none,Phiên bản Master Document dùng cho Q table,Master Doc §9
+03_candidate_csv_template.csv,dictionary_version,string,vd v1.0,none,Phiên bản D1-D4 (Session 03),Session03
+03_candidate_csv_template.csv,candidate_id,string,"{clinic_id}:{patient_id}",none,ID ổn định của candidate; không đổi qua run,Session05 §3.1; REQ08
+03_candidate_csv_template.csv,clinic_id,string,giá trị clinic_master.clinic_id,none,Mã cơ sở gốc,Session02 §3
+03_candidate_csv_template.csv,clinic_tool_group,string,NAHT|HOMIS,none,Nhóm pipeline crawl của cơ sở,clinic_tool_mapping_v1.0.md
+03_candidate_csv_template.csv,patient_id,string,giá trị gốc DB,none,Mã bệnh nhân nội bộ cơ sở (KHÔNG duy nhất toàn hệ thống),Session02 §6.3
+03_candidate_csv_template.csv,in_set_a_q10,boolean,Y|N,none,Có >=1 dòng disease_records khớp Q10 (D1 category hợp lệ, state A/S),02_q_conditions.json Q10
+03_candidate_csv_template.csv,in_set_b_q20,boolean,Y|N,none,Có >=1 dòng medical_records khớp Q20 (D2 search_term),02_q_conditions.json Q20
+03_candidate_csv_template.csv,in_set_c_wide_qc1,boolean,Y|N,none,Có >=1 dòng medical_class in {31/32/33},02_q_conditions.json QC1; DEC-04-01
+03_candidate_csv_template.csv,in_set_c_narrow_qc2,boolean,Y|N|UNCONFIRMED,UNCONFIRMED cho tới khi đóng OPEN-04-01,Có khớp billing C005-2,02_q_conditions.json QC2; OPEN-04-01
+03_candidate_csv_template.csv,in_q30,boolean,Y|N,none,A AND B (ứng viên chính),02_q_conditions.json Q30
+03_candidate_csv_template.csv,in_q31,boolean,Y|N,none,B AND NOT A (rà soát bỏ sót bệnh danh),02_q_conditions.json Q31
+03_candidate_csv_template.csv,in_q32,boolean,Y|N,none,A AND NOT B (rà soát rò từ điển D2),02_q_conditions.json Q32
+03_candidate_csv_template.csv,combination_cell,string,"A_only|B_only|C_only|A_and_B(=Q30)|A_and_C_not_B|B_and_C_not_A|A_and_B_and_C",none,Ô trong ma trận 7 ô A/B/C,04_candidate_combination_matrix_vn.md
+03_candidate_csv_template.csv,exclusion_granularity,string,patient_whole_period|month,none,Cấp độ áp dụng loại trừ cho Q31/Q32,DEC-04-02
+03_candidate_csv_template.csv,d3_judgment_code,string,A|B|C|X|NA,NA nếu in_q30=N,Mã ưu tiên rà soát D3 (chỉ tính khi thuộc Q30),D3 (Session03 §6); APPLY-1..5
+03_candidate_csv_template.csv,competing_diagnosis_flag,boolean,Y|N,none,Có đồng thời category O (APPLY-4),APPLY-4
+03_candidate_csv_template.csv,flag_zzz_pending_confirmation,boolean,Y|N,none,Có >=1 disease_code bắt đầu bằng ZZZ trong evidence,Session02 nghi vấn #3
+03_candidate_csv_template.csv,needs_form_check,boolean,Y|N,none,Có >=1 D2 hit cần xác nhận dạng thuốc,D2-2 notes (vd A03/A17)
+03_candidate_csv_template.csv,q40_hint_count,integer,>=0 hoặc NA,NA nếu in_q30=N (Q40 chỉ tính trong Q30),Số lượng gợi ý outcome D4-3 khớp,02_q_conditions.json Q40
+03_candidate_csv_template.csv,n_disease_evidence_rows,integer,>=0,none,Số dòng trong 04_disease_evidence_csv_template.csv cùng candidate+run,Session05 §5 (đối chiếu)
+03_candidate_csv_template.csv,n_medication_evidence_rows,integer,>=0,none,Số dòng trong 05_medication_evidence_csv_template.csv cùng candidate+run,Session05 §5
+03_candidate_csv_template.csv,n_procedure_evidence_rows,integer,>=0,none,Số dòng trong 06_procedure_evidence_csv_template.csv cùng candidate+run,Session05 §5
+03_candidate_csv_template.csv,search_period_start,date,YYYY-MM-DD,none,Mốc bắt đầu kỳ Day0 tìm kiếm (R12),R12
+03_candidate_csv_template.csv,search_period_end,date,YYYY-MM-DD,none,Mốc kết thúc kỳ Day0 tìm kiếm (R12),R12
+03_candidate_csv_template.csv,lookback_start_date,date,YYYY-MM-DD,none,Mốc mở rộng tìm kiếm lùi về trước để xác nhận không có lượt dùng trước đó,R12
+03_candidate_csv_template.csv,notes,string,tự do,rỗng nếu không có,Ghi chú máy sinh (vd lý do đưa vào Q31/Q32),—
+04_disease_evidence_csv_template.csv,run_id,string,như Candidate CSV,none,Khớp run sinh ra dòng evidence này,Session05 §3.3
+04_disease_evidence_csv_template.csv,candidate_id,string,như Candidate CSV,none,Khóa join tới Candidate CSV,Session05 §5
+04_disease_evidence_csv_template.csv,clinic_id,string,như Candidate CSV,none,Mã cơ sở (denormalized để lọc nhanh),—
+04_disease_evidence_csv_template.csv,patient_id,string,như Candidate CSV,none,Mã bệnh nhân (denormalized),—
+04_disease_evidence_csv_template.csv,source_table,string,"disease_records",none,Bảng gốc,Session02 §3
+04_disease_evidence_csv_template.csv,perform_month,string,YYYY-MM,none,Tháng ghi nhận gốc,Session02 §3
+04_disease_evidence_csv_template.csv,disease_name_original,string,nguyên văn gốc,none,Tên bệnh danh GỐC chưa chuẩn hoá,CLAUDE.md "preserve original database values"
+04_disease_evidence_csv_template.csv,disease_name_normalized,string,NFKC,none,Tên bệnh danh sau NFKC,REQ05
+04_disease_evidence_csv_template.csv,disease_code,string,7 ký tự gốc,none,Mã bệnh gốc (có thể có tiền tố ZZZ),Session02 §6.4
+04_disease_evidence_csv_template.csv,flag_zzz_pending_confirmation,boolean,Y|N,none,disease_code bắt đầu bằng ZZZ,Session02 nghi vấn #3
+04_disease_evidence_csv_template.csv,start_date,date,YYYY-MM-DD hoặc rỗng-thật,giữ nguyên rỗng nếu DB gốc rỗng,Ngày bắt đầu bệnh danh (không phải Day0 điều trị),C01; REQ02 (phụ thuộc EHR)
+04_disease_evidence_csv_template.csv,in_out,string,giá trị gốc (trống 100% theo Session02),giữ nguyên rỗng-thật,Cột in_out gốc,Session02 §6.1
+04_disease_evidence_csv_template.csv,d1_matched_modifier_id,string,M01-M08|NA,NA nếu không khớp modifier nào,Modifier D1 đã khớp,D1-1 (Session03 §4)
+04_disease_evidence_csv_template.csv,d1_state,string,A|S|H|X,none,Trạng thái D1 sau áp modifier,D1 §3.1-3.2
+04_disease_evidence_csv_template.csv,d1_category,string,"PS|PB|PG|PA|PL|PV|LB|UR|VI|BI|O|Q|R|K|T|F|N|Z",none,Category D1 đã khớp (Z = không thuộc dictionary D1),D1-2 (18 category)
+04_disease_evidence_csv_template.csv,d1_category_name_jp,string,tham chiếu D1_disease.csv,none,Tên category D1 (tiện tra cứu khi rà soát),D1-2
+04_disease_evidence_csv_template.csv,matched_q10,boolean,Y|N,none,category thuộc {PS/PB/PG/PA/PL/PV/LB/Q} AND state in {A,S},Q10
+04_disease_evidence_csv_template.csv,dictionary_version,string,vd v1.0,none,Phiên bản D1 dùng để match dòng này,Session03
+04_disease_evidence_csv_template.csv,fetched_at,string,ISO datetime gốc,none,Thời điểm crawl dòng gốc,Session02 §6.5
+04_disease_evidence_csv_template.csv,source_record_ref,string,"disease_records|clinic_id|patient_id|perform_month|disease_name|in_out",none,Tham chiếu PK thật của disease_records,Session05 §3.4
+05_medication_evidence_csv_template.csv,run_id,string,như trên,none,—,—
+05_medication_evidence_csv_template.csv,candidate_id,string,như trên,none,—,—
+05_medication_evidence_csv_template.csv,clinic_id,string,như trên,none,—,—
+05_medication_evidence_csv_template.csv,patient_id,string,như trên,none,—,—
+05_medication_evidence_csv_template.csv,source_table,string,"medical_records",none,Bảng gốc,Session02 §3
+05_medication_evidence_csv_template.csv,perform_month,string,YYYY-MM,none,Tháng ghi nhận (KHÔNG có ngày cụ thể ở bảng này),C03; REQ03 (phụ thuộc EHR)
+05_medication_evidence_csv_template.csv,medication_name_original,string,nguyên văn gốc,none,Tên thuốc/hành vi GỐC,CLAUDE.md
+05_medication_evidence_csv_template.csv,medication_name_normalized,string,NFKC,none,Tên sau NFKC,REQ05
+05_medication_evidence_csv_template.csv,medication_code,string,9 ký tự số gốc,none,Mã diện báo billing (không phải mã YJ),Session02 §6.4
+05_medication_evidence_csv_template.csv,medical_class,string,2 ký tự số gốc,none,Phân loại hành vi (vd 31/32/33),Session02 §6.2
+05_medication_evidence_csv_template.csv,medical_class_name,string,nguyên văn gốc,none,Tên phân loại hành vi,—
+05_medication_evidence_csv_template.csv,perform_count_raw,integer,giá trị gốc,none,"Giá trị thô, KHÔNG tự diễn giải là số ngày truyền dịch thực tế",Session02 §7; nghi vấn #4 (mở)
+05_medication_evidence_csv_template.csv,in_out,string,giá trị gốc,giữ nguyên rỗng-thật,Cột in_out gốc,Session02 §6.1
+05_medication_evidence_csv_template.csv,matched_q20,boolean,Y|N,none,Có khớp >=1 search_term D2,Q20
+05_medication_evidence_csv_template.csv,d2_search_term_id,string,A01-A41|U01-U09|NA,NA nếu không khớp,search_term D2 đã khớp,D2-2/D2-3
+05_medication_evidence_csv_template.csv,d2_ingredient_id,string,như search_term_id gốc|NA,NA nếu không khớp,Thành phần D2 cha của search_term,D2-2/D2-3
+05_medication_evidence_csv_template.csv,d2_confirmed_status,string,A|U|NA,NA nếu không khớp,Đã xác nhận (A) hay chưa xác nhận (U),D2-3
+05_medication_evidence_csv_template.csv,d2_group,string,G1-G6|NA,NA nếu không khớp,Nhóm kháng sinh dùng cho D3,D3-1
+05_medication_evidence_csv_template.csv,needs_form_check,boolean,Y|N,none,search_term có cảnh báo cần xác nhận dạng thuốc,D2-2 notes
+05_medication_evidence_csv_template.csv,matched_q40_hint,boolean,Y|N,none,Có khớp hạng mục gợi ý outcome D4-3,Q40; D4-3
+05_medication_evidence_csv_template.csv,q40_hint_matched_text,string,tên hạng mục D4-3|rỗng,rỗng nếu matched_q40_hint=N,Tên gợi ý outcome đã khớp,D4-3
+05_medication_evidence_csv_template.csv,dictionary_version,string,vd v1.0,none,—,Session03
+05_medication_evidence_csv_template.csv,fetched_at,string,ISO datetime gốc,none,—,Session02 §6.5
+05_medication_evidence_csv_template.csv,source_record_ref,string,"medical_records|clinic_id|patient_id|perform_month|medication_code|in_out",none,Tham chiếu PK thật của medical_records,Session05 §3.4
+06_procedure_evidence_csv_template.csv,run_id,string,như trên,none,—,—
+06_procedure_evidence_csv_template.csv,candidate_id,string,như trên,none,—,—
+06_procedure_evidence_csv_template.csv,clinic_id,string,như trên,none,—,—
+06_procedure_evidence_csv_template.csv,patient_id,string,như trên,none,—,—
+06_procedure_evidence_csv_template.csv,source_table,string,medical_records|medical_points,none,Bảng gốc (2 bảng khác nhau tùy loại bằng chứng),Session02 §3
+06_procedure_evidence_csv_template.csv,perform_month,string,YYYY-MM,none,—,—
+06_procedure_evidence_csv_template.csv,medical_day,date,YYYY-MM-DD|NA,NA cho dòng nguồn medical_records (không có cột ngày),Ngày cụ thể - CHỈ có ở dòng nguồn medical_points và CHỈ ở nhóm HOMIS,Session02 §6.2
+06_procedure_evidence_csv_template.csv,procedure_evidence_type,string,"QC1_WIDE_INJECTION_CLASS|QC2_NARROW_C005_2|MEDICAL_POINTS_DAY_HINT",none,Loại bằng chứng thủ thuật/truyền dịch,DEC-04-01
+06_procedure_evidence_csv_template.csv,medical_class,string,2 ký tự số gốc,none,—,—
+06_procedure_evidence_csv_template.csv,medical_class_name,string,nguyên văn gốc,none,—,—
+06_procedure_evidence_csv_template.csv,medication_name_original,string,nguyên văn gốc|NA,NA cho dòng nguồn medical_points (bảng này không có tên thuốc),Tên thuốc/hạng mục GỐC (chỉ khi nguồn là medical_records),Session02 §3
+06_procedure_evidence_csv_template.csv,medication_name_normalized,string,NFKC|NA,NA cho dòng nguồn medical_points,—,REQ05
+06_procedure_evidence_csv_template.csv,point,integer,giá trị gốc|NA,NA cho dòng nguồn medical_records (cột point chỉ có ở medical_points),Điểm billing (chỉ ở medical_points),Session02 §3
+06_procedure_evidence_csv_template.csv,in_out,string,giá trị gốc,giữ nguyên rỗng-thật,—,Session02 §6.1
+06_procedure_evidence_csv_template.csv,open_issue_ref,string,"OPEN-04-01|OPEN-04-02|rỗng",rỗng nếu không có nghi vấn mở áp dụng,Tham chiếu nghi vấn mở liên quan tới độ tin cậy dòng này,05_decision_register_vn.md (Session04)
+06_procedure_evidence_csv_template.csv,dictionary_version,string,vd v1.0,none,—,Session03
+06_procedure_evidence_csv_template.csv,fetched_at,string,ISO datetime gốc,none,—,Session02 §6.5
+06_procedure_evidence_csv_template.csv,source_record_ref,string,"{table}|clinic_id|patient_id|perform_month|{khóa đặc trưng bảng}",none,Tham chiếu PK thật của bảng nguồn tương ứng,Session05 §3.4
+07_manual_review_template.csv,candidate_id,string,như Candidate CSV,none,Candidate được rà soát,Session05 §5
+07_manual_review_template.csv,clinic_id,string,denormalized,none,—,—
+07_manual_review_template.csv,patient_id,string,denormalized,none,—,—
+07_manual_review_template.csv,source_run_id,string,run_id tham chiếu,none,Lượt trích xuất làm căn cứ rà soát này,Session05 §3
+07_manual_review_template.csv,episode_id,string,"{candidate_id}-EP{seq}|NA",NA nếu review_decision != SUBJECT,ID episode do người rà soát gán,Session05 §3.2; R02/R04
+07_manual_review_template.csv,episode_seq,integer,>=1|NA,NA nếu review_decision != SUBJECT,Số thứ tự episode của candidate này,R04
+07_manual_review_template.csv,prior_episode_id,string,episode_id trước|NA,NA nếu là episode đầu tiên,Episode liền trước (cho quy tắc 14 ngày),R04
+07_manual_review_template.csv,review_decision,string,SUBJECT|NOT_SUBJECT|PENDING,none,Phán định đối tượng/ngoài đối tượng/tạm giữ,Session01 §5.2
+07_manual_review_template.csv,review_decision_reason,string,tự do,rỗng nếu SUBJECT và không cần giải thích thêm,Lý do phán định (bắt buộc nếu NOT_SUBJECT),—
+07_manual_review_template.csv,day0_date,date,YYYY-MM-DD|UNKNOWN,UNKNOWN nếu chưa xác định,Ngày dùng kháng sinh tiêm đầu tiên tại nhà,R03
+07_manual_review_template.csv,day0_date_source,string,ACTUAL_ADMINISTRATION|INSTRUCTION_OR_PRESCRIPTION_PROXY|UNKNOWN,—,Nguồn xác định Day0 (thực dùng hay dùng ngày chỉ định/kê đơn thay thế),R03
+07_manual_review_template.csv,end_of_life_care_at_day0,boolean,Y|N|UNKNOWN,—,BN đã xác định phương châm chăm sóc cuối đời TẠI Day0 hay chưa,R08
+07_manual_review_template.csv,end_of_life_care_change_after_day0,boolean,Y|N|NA,NA nếu end_of_life_care_at_day0 != Y,Phương châm đổi SAU Day0 (nếu có thì không loại trừ),R08
+07_manual_review_template.csv,respiratory_infection_purpose_confirmed,boolean,Y|N|UNKNOWN,—,Xác nhận mục đích điều trị là nhiễm hô hấp (không chỉ trùng tên/tháng),Session01 §5.2
+07_manual_review_template.csv,home_administration_confirmed,boolean,Y|N|UNKNOWN,—,Xác nhận thực tế dùng thuốc tại nhà (khác với chỉ định/kê đơn),Session01 §5.2
+07_manual_review_template.csv,episode_boundary_rule_applied,string,14_DAY_GAP|NA,NA nếu không áp dụng (episode đầu tiên),Quy tắc xác định episode mới đã áp dụng,R04
+07_manual_review_template.csv,d3_judgment_code_at_review,string,A|B|C|X|NA,sao chép từ Candidate CSV tại thời điểm rà soát,Mã D3 tại thời điểm rà soát (có thể khác nếu dictionary đã đổi version),D3
+07_manual_review_template.csv,dictionary_version_at_review,string,vd v1.0,none,—,Session03
+07_manual_review_template.csv,q_table_version_at_review,string,vd v1.0,none,—,Master Doc
+07_manual_review_template.csv,reviewer_id,string,tự do (định danh người rà soát),none,Người thực hiện rà soát,Session01 §5.2
+07_manual_review_template.csv,review_date,date,YYYY-MM-DD,none,Ngày thực hiện rà soát,—
+07_manual_review_template.csv,review_notes,string,tự do,rỗng nếu không có,"Ghi chú (KHÔNG ghi tên bệnh nhân vào cột này)",CLAUDE.md mục 3 (REQ08)
+08_outcome_template.csv,episode_id,string,như Manual Review,none,Episode được theo dõi outcome,Session05 §3.2
+08_outcome_template.csv,candidate_id,string,denormalized,none,—,—
+08_outcome_template.csv,clinic_id,string,denormalized,none,—,—
+08_outcome_template.csv,patient_id,string,denormalized,none,—,—
+08_outcome_template.csv,day0_date,date,sao chép từ Manual Review,none,—,R03
+08_outcome_template.csv,observation_window_definition,string,"0-30|0-29",none,Cách tính cửa sổ 30 ngày (CHƯA quyết định chính thức - phải ghi rõ mỗi dòng),R05 (chưa quyết định)
+08_outcome_template.csv,observation_window_end_date,date,YYYY-MM-DD|UNKNOWN,UNKNOWN nếu day0_date=UNKNOWN,Ngày kết thúc cửa sổ quan sát,R05
+08_outcome_template.csv,outcome_tracking_status,string,CONFIRMED_WITHIN_WINDOW|CONFIRMED_OUTSIDE_WINDOW|NO_OUTCOME|NOT_CONFIRMABLE,none,"Trạng thái theo dõi; NOT_CONFIRMABLE != NO_OUTCOME",R07
+08_outcome_template.csv,outcome_type,string,"UNPLANNED_HOSPITALIZATION|EMERGENCY_VISIT|DEATH|PLANNED_HOSPITALIZATION_EXCLUDED|NA",NA nếu outcome_tracking_status in {NO_OUTCOME,NOT_CONFIRMABLE},Loại kết cục (nhập viện có kế hoạch được ghi nhận riêng để audit, KHÔNG tính vào R06),R06
+08_outcome_template.csv,outcome_date,date,YYYY-MM-DD|NA,NA nếu không có outcome_type xác định,Ngày xảy ra kết cục,R06
+08_outcome_template.csv,outcome_evidence_source,string,CHART_NOTE|REFERRAL_LETTER|DEATH_CERTIFICATE|OTHER_FACILITY_REPORT|UNKNOWN,—,Nguồn xác nhận kết cục,Session01 §5.3
+08_outcome_template.csv,outcome_confirmed_by_billing_hint_only,boolean,Y|N,none,"Cờ QA - PHẢI là N; nếu Y thì dòng này KHÔNG được coi là CONFIRMED",CLAUDE.md "never infer... from billing... alone"
+08_outcome_template.csv,q40_hint_reference,string,source_record_ref từ Medication Evidence|rỗng,rỗng nếu không có gợi ý liên quan,Liên kết ngược tới gợi ý Q40 ban đầu (nếu có),Q40
+08_outcome_template.csv,reviewer_id,string,tự do,none,—,—
+08_outcome_template.csv,review_date,date,YYYY-MM-DD,none,—,—
+08_outcome_template.csv,notes,string,tự do,rỗng nếu không có,"Ghi chú (KHÔNG ghi tên bệnh nhân vào cột này)",CLAUDE.md mục 3
+07_manual_review_template.csv,day0_evidence,string,source_record_ref từ Disease/Medication Evidence|rỗng,rỗng nếu chưa điền,"ADDENDUM 2026-11-05 (DEC-S05-ADD-01 option a) — tham chiếu bản ghi xác nhận Day 0 (= B05 trong export 39-cột); tool KHÔNG tự điền",UNDECIDED-S05-11 (resolved: lưu trong 07, giá trị do người điền)
+07_manual_review_template.csv,context_review_flags,string,"Tham chiếu D5_context_flags (DRAFT, xem dictionaries/D5_context_flags.csv), nhiều mã nối bằng "";""|rỗng",rỗng nếu không có cờ nào,"ADDENDUM 2026-11-05 — cờ ngữ cảnh rà soát (= B17 trong export 39-cột); D5 là dictionary DRAFT chưa phê duyệt chính thức, chỉ tham khảo",UNDECIDED-S05-17 (resolved: approve D5 DRAFT)
+07_manual_review_template.csv,qc_status,string,未確認|問題なし|要修正・修正済み|rỗng,rỗng nếu chưa QC,"ADDENDUM 2026-11-05 — trạng thái nhị kiểm tra (= C-1 trong export 39-cột), nguyên văn 3 giá trị tiếng Nhật theo CSV Design Guide v1.0 §6 (chưa dịch/đổi sang mã khác)",DEC-S05-ADD-01
+07_manual_review_template.csv,qc_issue,string,"Mã tự do (vd 重複、日付矛盾、根拠不明、転帰ミス等 — chưa phải danh mục đóng)|rỗng",rỗng nếu không có vấn đề,"ADDENDUM 2026-11-05 — mã loại vấn đề QC (= C-2 trong export 39-cột); CSV Design Guide chỉ cho ví dụ, KHÔNG phải danh mục đã duyệt đầy đủ — Outside Dictionary",DEC-S05-ADD-01
+08_outcome_template.csv,outcome_evidence_ref,string,source_record_ref hoặc reference ID tự do|rỗng,rỗng nếu chưa điền,"ADDENDUM 2026-11-05 (DEC-S05-ADD-01 option a) — tham chiếu bản ghi xác nhận kết cục, theo từng loại (= B14 trong export 39-cột); tool KHÔNG tự điền",UNDECIDED-S05-14 (resolved: lưu trong 08, giá trị do người điền)
+08_outcome_template.csv,last_followup_date,date,YYYY-MM-DD|rỗng,rỗng nếu chưa điền,"ADDENDUM 2026-11-05 — ngày cuối cùng thực tế xác nhận được thông tin theo dõi (= B15 trong export 39-cột); KHÁC với observation_window_end_date (ngày tính toán Day0+30) — không được tự gộp 2 khái niệm này, theo đúng CSV Design Guide v1.0 §5",UNDECIDED-S05-15 (resolved: lưu trong 08)
+08_outcome_template.csv,followup_unknown_reason,string,tự do|rỗng,rỗng nếu theo dõi đầy đủ,"ADDENDUM 2026-11-05 — lý do không theo dõi được (= B16 trong export 39-cột); tool KHÔNG tự điền",UNDECIDED-S05-16 (resolved: lưu trong 08)

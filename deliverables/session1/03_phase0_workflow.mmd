@@ -1,0 +1,86 @@
+%% Phase 0 Workflow — AGRI CARE Cohort Analysis Tool
+%% Nguồn: Phase 0 Implementation Policy (2026-11-02) + Medical/Pharmaceutical Basic Materials (2026-11-02)
+%% Chú thích trạng thái: R03/R04/R05/R08/R09/R10/R11/R12 = xem Master Document Ch.1
+
+flowchart TD
+    subgraph PHASE0["PHASE 0 (trong phạm vi hiện tại)"]
+        direction TB
+
+        DB[("SQLite orca_snapshot.db\nORCA 由来データ\n(chỉ đọc)")]
+
+        subgraph STEP1["Bước 1 — Cohort Analysis Tool (mới): Trích xuất ứng viên"]
+            direction TB
+            A["Tìm A: 病名 (bệnh danh)\nD1 + Q10\n(18 phân loại, trạng thái A/S/H/X)"]
+            B["Tìm B: 注射用抗菌薬 (kháng sinh tiêm)\nD2 + Q20\n(89 từ khóa, 41+9 thành phần)"]
+            C["Tìm C: 点滴実施・指示記録\n(truyền dịch / chỉ định, nếu lấy được)"]
+            FLAG["Giữ cờ tổ hợp:\nA-only / B-only / C-only /\nA∩B / A∩C / B∩C / A∩B∩C\n(KHÔNG coi A AND B là bắt buộc duy nhất)"]
+            D3["D3: Bảng phán định\n病名区分 × 抗菌薬群 → mã A/B/C/X\n(chỉ là ưu tiên rà soát, KHÔNG xác nhận đối tượng)"]
+            D4["D4: Chỉ dấu outcome (P20–P25)\nQ40: gợi ý chuyển viện/tử vong/vãng diện"]
+
+            A --> FLAG
+            B --> FLAG
+            C --> FLAG
+            FLAG --> D3
+            D3 --> D4
+        end
+
+        subgraph STEP2["Bước 2 — Cohort Analysis Tool (mới): Xuất CSV & chuẩn hoá danh sách"]
+            direction TB
+            DEDUP["Khử trùng lặp theo\n'Cơ sở + Mã bệnh nhân'\n(R02)"]
+            SEP["Phân biệt Bệnh nhân vs Treatment Episode"]
+            META["Ghi: ID điều kiện (Q), phiên bản tài liệu,\nngày thực hiện, phiên bản DB nguồn (REQ09)"]
+            ANON["Ẩn danh hoá:\nID = f(mã cơ sở + mã BN), bỏ tên (REQ08)"]
+            CSV["CSV ứng viên có căn cứ khớp\n(REQ07) — chưa phải đối tượng xác nhận"]
+
+            DEDUP --> SEP --> META --> ANON --> CSV
+        end
+
+        D4 --> DEDUP
+    end
+
+    subgraph MANUAL["Rà soát & phân tích — CON NGƯỜI (không tự động hoá)"]
+        direction TB
+
+        subgraph STEP3["Bước 3 — Rà soát bệnh án điện tử (EHR) thủ công"]
+            direction TB
+            PURPOSE["Xác nhận mục đích điều trị\n= nhiễm hô hấp tại nhà"]
+            ACTUAL["Xác nhận thực tế dùng thuốc\n(không chỉ chỉ định/kê đơn)"]
+            DAY0["Xác định Day 0 thực tế (R03)"]
+            EXCL["Áp dụng loại trừ chăm sóc cuối đời (R08)"]
+            EPISODE["Phán định episode mới nếu cách ≥14 ngày (R04)"]
+            DECISION["Phán định: Đối tượng / Ngoài đối tượng / Tạm giữ"]
+
+            PURPOSE --> ACTUAL --> DAY0 --> EXCL --> EPISODE --> DECISION
+        end
+
+        subgraph STEP4["Bước 4 — Xác nhận outcome 30 ngày & phân tích hồi cứu"]
+            direction TB
+            WINDOW["Cửa sổ quan sát 30 ngày từ Day 0 (R05 — chưa quyết định 0-29 hay 0-30)"]
+            OUTCOME["Xác nhận: nhập viện ngoài kế hoạch /\ncấp cứu / tử vong (R06)"]
+            UNKNOWN["Phân biệt 'không xác nhận được' (R07)\nvới 'không có outcome'"]
+            APPEND["Bổ sung CSV: outcome, ngày, căn cứ, người/ngày xác nhận"]
+            REPORT["Báo cáo 3 mức riêng:\nsố BN trúng tìm kiếm /\nsố BN thực dùng thuốc tại nhà /\nsố episode đã xác nhận"]
+
+            WINDOW --> OUTCOME --> UNKNOWN --> APPEND --> REPORT
+        end
+    end
+
+    DB --> A
+    DB --> B
+    DB --> C
+    CSV --> PURPOSE
+    DECISION --> WINDOW
+
+    subgraph FUTURE["NGOÀI PHẠM VI PHASE 0 (future phase)"]
+        direction TB
+        F1["Tự động xác nhận treatment episode đối tượng"]
+        F2["Tự động phán định outcome & tự động ghi CSV"]
+        F3["Bổ sung tính năng tìm kiếm cao cấp\nvào bệnh án điện tử (EHR) gốc"]
+    end
+
+    DECISION -. "không tự động hoá" .-> F1
+    REPORT -. "không tự động hoá" .-> F2
+
+    style PHASE0 fill:#eef6ff,stroke:#2b6cb0
+    style MANUAL fill:#fff8e6,stroke:#b7791f
+    style FUTURE fill:#f5f5f5,stroke:#9aa5b1,stroke-dasharray: 5 5
