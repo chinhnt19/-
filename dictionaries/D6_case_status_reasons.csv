@@ -1,0 +1,11 @@
+row_type,id,b02_status,reason_text_jp,excluded_from_outcome_denominator,confirmation_status,source_table,source_ref,version
+CASE_STATUS,CS-A,対象,(研究対象として適格),no,確定（手順書v1.3.1 §3 の定義を満たす候補),CSV設計説明書v1.3.1 B02,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1
+CASE_REASON,B03-OUT-01,対象外,在宅での投与なし,no,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-OUT-02,対象外,呼吸器以外の感染症,no,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-OUT-03,対象外,看取り方針（起点時点）,no,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-OUT-04,対象外,静注・点滴静注ではない（皮下注・筋注・補液のみ）,no,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-OUT-05,対象外,対象期間外,no,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-HOLD-01,保留,実施を確認できない（算定はあるが投与記録が見つからない）,yes,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-HOLD-02,保留,呼吸器感染症の疑い（「疑い」病名のみで確認病名なし）,yes,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+CASE_REASON,B03-HOLD-03,保留,治療目的が不明,yes,DRAFT — chưa phê duyệt chính thức (Mục 5 #3),CSV設計説明書v1.3.1 B03,後ろ向き集計 診療録レビューの判定基準v1.3.1 §4 / 早見表v1.3.1 §4.2,v1.3.1-draft
+NOTE,N01,,"保留の行は急変率の分母に入れない（表Aで別件数として報告する）。データ不足（投与記録なし／疑いのみ／目的不明）は常に保留に分類し、対象外（除外）とは区別する — 保留≠除外のルールを B03 の列自体で強制する。",,確定（手順書v1.3.1 §5 表A）,-,deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md §2.5,v1.3.1

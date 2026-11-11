@@ -6,10 +6,10 @@ ANTIBIOTIC_GROUP,G3,,嫌気性菌を主な標的とする薬,"成分ID: A11, A12
 ANTIBIOTIC_GROUP,G4,,広域・抗緑膿菌・耐性菌用,成分ID: A16〜A33（A31を除く）、U01〜U06,確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
 ANTIBIOTIC_GROUP,G5,,抗MRSA薬,成分ID: A34〜A37、U07,確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
 ANTIBIOTIC_GROUP,G6,,呼吸器感染症の経験的治療に通常用いない,"成分ID: A31, A38, A39, A40, A41, U08, U09",確定,D3-1,"Master Doc v1.0 §5.1, Table D3-1",v1.0
-JUDGMENT_CODE,A,,優先確定レビュー,診療録で確定エピソードかを最優先で判定する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
-JUDGMENT_CODE,B,,確定レビュー（追加確認あり）,重症度・耐性菌・合併感染・病型を確認して判定する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
-JUDGMENT_CODE,C,,低優先レビュー,他部位感染や他目的の投与の可能性が高い。件数が多い場合は無作為抽出で確認する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
-JUDGMENT_CODE,X,,呼吸器感染症の根拠なし,主解析の候補にしない。見逃し評価のために一定数を無作為抽出して確認する,確定,D3-2,"Master Doc v1.0 §5.2, Table D3-2",v1.0
+JUDGMENT_CODE,A,,優先レビュー,最初にレビューする。呼吸器感染症の治療である可能性が高い,確定,D3-2,後ろ向き集計 検索ツールの設計基準と辞書v1.3.1 / 検索ツール辞書v1.3.1.xlsx D3_判定コード,v1.3.1
+JUDGMENT_CODE,B,,レビュー（追加確認あり）,重症度・耐性菌・合併感染・病型に注意して判定する,確定,D3-2,後ろ向き集計 検索ツールの設計基準と辞書v1.3.1 / 検索ツール辞書v1.3.1.xlsx D3_判定コード,v1.3.1
+JUDGMENT_CODE,C,,低優先レビュー,他部位の感染症や、他の目的の投与の可能性が高い。投与目的を必ず確認する,確定,D3-2,後ろ向き集計 検索ツールの設計基準と辞書v1.3.1 / 検索ツール辞書v1.3.1.xlsx D3_判定コード,v1.3.1
+JUDGMENT_CODE,X,,呼吸器感染症の病名なし,最後にレビューする。呼吸器以外の感染症（B03）か、病名の登録漏れかを確認する,確定,D3-2,後ろ向き集計 検索ツールの設計基準と辞書v1.3.1 / 検索ツール辞書v1.3.1.xlsx D3_判定コード,v1.3.1
 MATRIX_CELL,PS・PB・PG,G1,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
 MATRIX_CELL,PS・PB・PG,G2a,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
 MATRIX_CELL,PS・PB・PG,G2b,A,,確定,D3-3,"Master Doc v1.0 §5.3, Table D3-3",v1.0
