@@ -1,73 +1,42 @@
-"""Builds the 2 human-authored templates (Manual Review / Outcome) -- blank
-except for identity columns. Per CLAUDE.md mục 3 / Session 05 §9, no module
-anywhere in this app may fill in a clinical column (review_decision,
-day0_date, episode_id, outcome_type, ...) -- only a human reviewer does,
-outside this tool. There is deliberately no "write"/"update" function here
-that re-saves an already-filled template; this module only ever produces a
-fresh blank one.
+"""Builds the single unified review CSV (A + blank B + blank C, 41
+columns) handed to the chart reviewer -- CSV設計説明書v1.3.1 §4, §6.4.
+
+v1.0/v1.1 had two separate human-authored templates (Manual Review +
+Outcome); v1.3.1 merges B (reviewer-filled) and C (QC) into the same file
+as A (tool-filled), so there is only one template to build now.
+
+Per CLAUDE.md mục 3 / CSV設計説明書v1.3.1 §7 ("検索ツールでは、次の処理を
+しない: case_status・Day 0・転帰の値を自動で決める"), no module anywhere in
+this app may fill in a B or C column -- only a human does, outside this
+tool. There is deliberately no "write"/"update" function here that
+re-saves an already-filled file; this module only ever produces a fresh
+blank-B/C copy of the tool's own A-block output.
+
+Episode splitting (CSV設計説明書 §6.4: a candidate whose billed months
+contain >=2 treatments gets its row copied, with B01 getting a
+"candidate_id-1", "candidate_id-2", ... suffix) is explicitly the
+reviewer's manual action on THIS file, not something the tool does --
+"検索ツールが最初に出力した行は削除しない。行のコピーは、レビュー用のCSVで
+行う。" So this module emits exactly one row per candidate; a reviewer
+who needs more than one treatment per candidate copies the row by hand
+in their spreadsheet tool before filling B01-B22.
 """
 from __future__ import annotations
 
 import pandas as pd
 
-from models.csv_schemas import MANUAL_REVIEW_COLUMNS, OUTCOME_COLUMNS
+from models.csv_schemas import CANDIDATE_COLUMNS, MANUAL_REVIEW_COLUMNS, QC_COLUMNS, UNIFIED_CSV_COLUMNS
 
 
-def build_review_template_blank(
-    candidate_rows: list[dict],
-    source_run_id: str,
-    q_table_version: str,
-    dictionary_version: str,
-) -> pd.DataFrame:
-    """One row per candidate, identity + (for reference only, per Session 05
-    §5/Block 7) the D3 code and dictionary/Q versions AT THE TIME OF EXPORT.
-    Every clinical column is left truly blank -- this is a file for a human
-    to fill in, not a machine-generated one waiting to be completed."""
+def build_review_csv_blank(candidate_rows: list[dict]) -> pd.DataFrame:
+    """One row per candidate: the 17 A columns as produced by the search
+    tool, plus the 22 B and 2 C columns all blank for the reviewer/QC
+    person to fill in."""
     rows = []
     for c in candidate_rows:
-        rows.append({
-            "candidate_id": c["candidate_id"], "clinic_id": c["clinic_id"], "patient_id": c["patient_id"],
-            "source_run_id": source_run_id, "episode_id": "", "episode_seq": "", "prior_episode_id": "",
-            "review_decision": "", "review_decision_reason": "", "day0_date": "", "day0_date_source": "",
-            "end_of_life_care_at_day0": "", "end_of_life_care_change_after_day0": "",
-            "respiratory_infection_purpose_confirmed": "", "home_administration_confirmed": "",
-            "episode_boundary_rule_applied": "", "d3_judgment_code_at_review": c.get("d3_judgment_code", ""),
-            "dictionary_version_at_review": dictionary_version, "q_table_version_at_review": q_table_version,
-            "reviewer_id": "", "review_date": "", "review_notes": "",
-            # ADDENDUM 2026-11-05 (DEC-S05-ADD-01 option a) -- blank, human-only.
-            "day0_evidence": "", "context_review_flags": "", "qc_status": "", "qc_issue": "",
-        })
-    df = pd.DataFrame(rows) if rows else pd.DataFrame(columns=list(MANUAL_REVIEW_COLUMNS))
-    return df[list(MANUAL_REVIEW_COLUMNS)]
-
-
-def build_outcome_template_blank(review_rows_with_episode: list[dict]) -> pd.DataFrame:
-    """One row per episode_id taken from an already-filled-in Manual Review
-    file (uploaded read-only via the import control) -- requires episode_id
-    to exist, i.e. review_decision == SUBJECT. Clinical outcome columns are
-    left blank; q40_hint_reference is left for the reviewer to fill (any
-    automatic suggestion would blur the "hint, not confirmation" boundary)."""
-    rows = []
-    for r in review_rows_with_episode:
-        episode_id = r.get("episode_id")
-        if not episode_id or str(episode_id).upper() == "NA":
-            continue
-        rows.append({
-            "episode_id": episode_id, "candidate_id": r.get("candidate_id", ""),
-            "clinic_id": r.get("clinic_id", ""), "patient_id": r.get("patient_id", ""),
-            "day0_date": r.get("day0_date", ""), "observation_window_definition": "",
-            "observation_window_end_date": "", "outcome_tracking_status": "", "outcome_type": "",
-            "outcome_date": "", "outcome_evidence_source": "",
-            "outcome_confirmed_by_billing_hint_only": "N", "q40_hint_reference": "",
-            "reviewer_id": "", "review_date": "", "notes": "",
-            # ADDENDUM 2026-11-05 (DEC-S05-ADD-01 option a) -- blank, human-only.
-            "outcome_evidence_ref": "", "last_followup_date": "", "followup_unknown_reason": "",
-            # ADDENDUM 2026-11-08 -- B13 admission_type. DB has no admission-
-            # type data (`in_out` always empty); reviewer types one of the
-            # v1.1 §3 example values (予定/予定外/不明) by hand. No
-            # validation against a fixed list yet -- scope of "入院" itself
-            # is still UNDECIDED-S05-13.
-            "admission_type": "",
-        })
-    df = pd.DataFrame(rows) if rows else pd.DataFrame(columns=list(OUTCOME_COLUMNS))
-    return df[list(OUTCOME_COLUMNS)]
+        row = {col: c.get(col, "") for col in CANDIDATE_COLUMNS}
+        row.update({col: "" for col in MANUAL_REVIEW_COLUMNS})
+        row.update({col: "" for col in QC_COLUMNS})
+        rows.append(row)
+    df = pd.DataFrame(rows) if rows else pd.DataFrame(columns=list(UNIFIED_CSV_COLUMNS))
+    return df[list(UNIFIED_CSV_COLUMNS)]
