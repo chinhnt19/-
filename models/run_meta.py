@@ -1,5 +1,10 @@
-"""Reproducibility metadata attached to every row of the 4 machine-generated
-CSVs (REQ09, Session 05 §3.3/§3.6)."""
+"""Reproducibility metadata attached to every candidate row of the unified
+v1.3.1 CSV (extract_batch_id, CSV設計説明書v1.3.1 §4.1 A01).
+
+`exclusion_granularity` (patient-whole-period vs. month) was a v1.0 concept
+tied to the old Q31/Q32 dictionary-leakage audit queries, which no longer
+exist -- v1.3.1 candidates are inherently month-grained from the start, so
+there is no longer a choice to record here."""
 from __future__ import annotations
 
 import hashlib
@@ -18,7 +23,6 @@ class RunMeta:
     search_period_start: str
     search_period_end: str
     lookback_start_date: str
-    exclusion_granularity: str  # EXCLUSION_GRANULARITY_PATIENT | EXCLUSION_GRANULARITY_MONTH
 
 
 def new_run_id(q_table_version: str, dictionary_version: str, now: datetime | None = None) -> str:
