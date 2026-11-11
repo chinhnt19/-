@@ -1,5 +1,7 @@
-"""Block 4 -- Candidate Statistics."""
+"""Thống kê candidate (model v1.3.1) + tỉ lệ転帰 30 ngày (sau khi upload file
+review đã điền B/C)."""
 import sys
+from collections import Counter
 from pathlib import Path
 
 _APP_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +14,6 @@ import pandas as pd
 import streamlit as st
 
 from _bootstrap import known_clinic_ids
-from exports.supplementary_export import build_supplementary_export
 from rules.clinic_tool_mapping import clinic_group
 from services.i18n import language_selector, t
 from services.outcome_rates import compute_outcome_rates
@@ -32,74 +33,101 @@ if df.empty:
     st.info(t("stats.no_candidates"))
     st.stop()
 
-df[t("col.group")] = df["clinic_id"].map(lambda c: clinic_group(c, known_clinic_ids()))
+df[t("col.group")] = df["facility_id"].map(lambda c: clinic_group(c, known_clinic_ids()))
 
-st.subheader(t("stats.matrix_header"))
-st.caption(t("stats.matrix_caption"))
-cell_order = ["A_only", "B_only", "C_only", "A_and_B(=Q30)", "A_and_C_not_B", "B_and_C_not_A", "A_and_B_and_C"]
-pivot = df.pivot_table(index="combination_cell", columns=t("col.group"), values="candidate_id", aggfunc="count", fill_value=0)
-pivot = pivot.reindex(cell_order, fill_value=0)
-pivot[t("stats.col_total")] = pivot.sum(axis=1)
-st.table(pivot)
-
+st.subheader("Tổng quan")
 c1, c2, c3 = st.columns(3)
-c1.metric(t("stats.metric_total_a"), int((df["in_set_a_q10"] == "Y").sum()))
-c2.metric(t("stats.metric_total_b"), int((df["in_set_b_q20"] == "Y").sum()))
-c3.metric(t("stats.metric_total_c"), int((df["in_set_c_wide_qc1"] == "Y").sum()))
-
-st.caption(t("stats.qc2_caption", n=int((df["in_set_c_narrow_qc2"] == "UNCONFIRMED").sum())))
+c1.metric("Số candidate", len(df))
+c2.metric("Số bệnh nhân (施設+患者番号)", df["patient_local_id"].nunique())
+c3.metric("Số cơ sở", df["facility_id"].nunique())
 
 st.divider()
-st.subheader(t("stats.d3_header"))
-d3_counts = df.loc[df["in_q30"] == "Y", "d3_judgment_code"].value_counts().reindex(["A", "B", "C", "X"], fill_value=0)
-st.bar_chart(d3_counts)
-
-n_competing = int((df["competing_diagnosis_flag"] == "Y").sum())
-st.metric(t("stats.metric_competing"), n_competing)
+st.subheader("Theo nhóm NAHT/HOMIS")
+by_group = df.groupby(t("col.group")).size().rename("Số candidate")
+st.bar_chart(by_group)
 
 st.divider()
-st.subheader(t("stats.by_clinic_header"))
-by_clinic = df.groupby(["clinic_id", t("col.group")]).size().rename(t("stats.col_candidate_count")).reset_index()
-st.bar_chart(by_clinic.set_index("clinic_id")[t("stats.col_candidate_count")])
+st.subheader("Theo đường dùng (A13 route_class)")
+route_counts = df["route_class"].value_counts()
+st.bar_chart(route_counts)
+st.caption("皮下筋肉注射 (medical_class 31) không được tính là candidate, không xuất hiện ở đây.")
+
+st.divider()
+st.subheader("Độ dài candidate (số tháng liên tục có算定)")
+st.bar_chart(df["record_months"].value_counts().sort_index())
+
+st.divider()
+st.subheader("Bệnh danh gắn vào candidate (A16 diagnosis_categories)")
+st.caption(
+    "Mỗi candidate có thể có nhiều病名, mỗi病名 có 1 trạng thái: A=確定（活動性）, S=疑い, "
+    "theo D1_修飾語. 保留「呼吸器感染症の疑い」(B02) vẫn là quyết định của reviewer, không phải ở đây."
+)
+cat_counter: Counter[str] = Counter()
+state_counter: Counter[str] = Counter()
+for cats in df["diagnosis_categories"]:
+    for token in (cats or "").split("|"):
+        if ":" not in token:
+            continue
+        cat, state = token.split(":", 1)
+        cat_counter[cat] += 1
+        state_counter[state] += 1
+if cat_counter:
+    cat_df = pd.DataFrame(sorted(cat_counter.items(), key=lambda kv: -kv[1]), columns=["区分", "số candidate"])
+    st.dataframe(cat_df, hide_index=True, width="stretch")
+    a_count, s_count = state_counter.get("A", 0), state_counter.get("S", 0)
+    st.caption(f"⚪ 確定/活動性 (A): {a_count} lượt   ·   🟡 疑い (S): {s_count} lượt — luôn tách biệt, không gộp chung.")
+else:
+    st.caption("Không có病名 nào được gắn.")
 
 st.divider()
 st.subheader(t("stats.unconfirmed_header"))
 st.table(pd.DataFrame([
-    {t("stats.col_field"): t("stats.row_req02_field"), t("col.status"): t("stats.status_req02")},
-    {t("stats.col_field"): t("stats.row_req03_field"), t("col.status"): t("stats.status_req03")},
-    {t("stats.col_field"): "disease_code LIKE 'ZZZ%'",
-     t("col.status"): t("stats.status_zzz", n=int((df["flag_zzz_pending_confirmation"] == "Y").sum()))},
-    {t("stats.col_field"): "QC2 (C005-2)", t("col.status"): t("stats.status_qc2")},
-    {t("stats.col_field"): "D4-1 P01-P11", t("col.status"): t("stats.status_d4")},
+    {"Hạng mục": "A06 age_at_start / A07 sex", "Trạng thái": "Luôn trống — DB không có trường nhân khẩu học"},
+    {"Hạng mục": "病名 転帰日 (outcome date)", "Trạng thái": "DB không có cột này — chỉ lọc theo ngày bắt đầu"},
+    {"Hạng mục": "D4 P08/P11 (入院中手技料/中心静脈注射)",
+     "Trạng thái": "Chưa xác minh đầy đủ với medical_class thật — xem addendum Mục 5 #6"},
+    {"Hạng mục": "disease_code LIKE 'ZZZ%'", "Trạng thái": "Chưa có ý nghĩa chính thức, chỉ đánh dấu"},
 ]), width="stretch")
 
 st.divider()
 st.subheader(t("stats.outcome_header"))
-imported_review = st.session_state.get("imported_review_df")
-imported_outcome = st.session_state.get("imported_outcome_df")
-has_episode = imported_review is not None and (imported_review["episode_id"].astype(str).replace("NA", "") != "").any()
-if imported_review is not None and imported_outcome is not None and has_episode:
-    supp_df = build_supplementary_export(
-        result.candidates, imported_review.to_dict("records"), imported_outcome.to_dict("records"),
-    )
-    rates = compute_outcome_rates(supp_df.to_dict("records"))
+st.caption(
+    "Quyết định tạm thời 2026-11-11: 保留 KHÔNG vào mẫu số chính, chỉ báo riêng. Nhập viện tính cả "
+    "2 cách (toàn bộ / chỉ ngoài kế hoạch) vì công thức急変率 chính thức chưa chốt (addendum Mục 5 #1)."
+)
+imported = st.session_state.get("imported_review_df")
+if imported is not None and (imported.get("case_status", pd.Series(dtype=str)) != "").any():
+    rates = compute_outcome_rates(imported.to_dict("records"))
 
     def _pct(v):
         return "—" if v is None else f"{v:.1f}%"
 
-    o1, o2 = st.columns(2)
-    o1.metric(t("stats.outcome_denominator_t"), rates["denominator_t"])
-    o2.metric(t("stats.outcome_held_back"), rates["held_back_count"])
+    o1, o2, o3, o4 = st.columns(4)
+    o1.metric("Mẫu số chính (対象, qua QC)", rates["denominator_t"])
+    o2.metric("保留 (báo riêng)", rates["held_back_count"])
+    o3.metric("対象外", rates["excluded_count"])
+    o4.metric("対象 nhưng chưa qua QC", rates["qc_not_passed_count"])
 
-    o3, o4, o5, o6 = st.columns(4)
-    o3.metric(t("stats.outcome_composite_rate"), _pct(rates["composite_rate_percent"]))
-    o4.metric(t("stats.outcome_fukaku_rate"), _pct(rates["fukaku_rate_percent"]))
-    o5.metric(t("stats.outcome_admission_rate"), _pct(rates["admission_rate_percent"]))
-    o6.metric(t("stats.outcome_transport_rate"), _pct(rates["transport_rate_percent"]))
-    st.metric(t("stats.outcome_death_rate"), _pct(rates["death_rate_percent"]))
+    tab_all, tab_unplanned = st.tabs(["Định nghĩa 1: toàn bộ nhập viện", "Định nghĩa 2: chỉ ngoài kế hoạch"])
+    for tab, key in ((tab_all, "all_admissions"), (tab_unplanned, "unplanned_admissions_only")):
+        with tab:
+            s = rates[key]
+            r1, r2, r3 = st.columns(3)
+            r1.metric("複合転帰 あり", s["composite_ari"])
+            r2.metric("複合転帰 なし", s["composite_nashi"])
+            r3.metric("確認不能", s["composite_fukaku"])
+            r4, r5 = st.columns(2)
+            r4.metric("複合転帰 割合", _pct(s["composite_rate_percent"]))
+            r5.metric("確認不能 割合", _pct(s["fukaku_rate_percent"]))
 
-    st.caption(t("stats.outcome_caveat"))
+    r6, r7, r8 = st.columns(3)
+    r6.metric("入院 割合", _pct(rates["admission_rate_percent"]))
+    r7.metric("救急搬送 割合", _pct(rates["transport_rate_percent"]))
+    r8.metric("死亡 割合", _pct(rates["death_rate_percent"]))
+    st.caption(
+        "割合はいずれもあり÷（あり＋なし）。確認不能の件数・割合は分子に含めない（CSV設計説明書v1.3.1 §8）。"
+    )
 else:
-    st.info(t("stats.outcome_no_data"))
+    st.info("Chưa có file review đã điền B/C được upload (trang Danh sách ứng viên / Xuất dữ liệu).")
 
 st.page_link("pages/3_Danh_sach_ung_vien.py", label=t("search.link_candidates"), icon="📋")

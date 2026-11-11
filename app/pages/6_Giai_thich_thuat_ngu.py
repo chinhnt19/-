@@ -30,6 +30,15 @@ language_selector()
 
 st.title(t("glossary.title"))
 st.caption(t("glossary.caption"))
+st.warning(
+    "⚠️ Các tab dưới đây (Tổng quan pipeline, Cách hoạt động — sơ đồ Venn A/B/C, Q30, D3 "
+    "\"certainty\") mô tả **model v1.0 cũ** (3 trục病名×薬剤×点滴手技), hiện KHÔNG còn đúng với "
+    "pipeline đang chạy (xem trang Tìm kiếm). Model v1.3.1 chỉ dùng 1 trục (注射用抗菌薬 AND "
+    "静注・点滴静注), nhóm theo tháng — xem `deliverables/session00/15_addendum_v1.3.1_migration_"
+    "plan_2026-11-11.md`. Nội dung các tab D1/D2/D3 (bảng dictionary) vẫn đúng/đọc trực tiếp từ "
+    "file hiện tại; chỉ phần diễn giải \"sets/certainty\" ở tab Cách hoạt động là lỗi thời. "
+    "Chưa cập nhật lại toàn bộ nội dung diễn giải — nằm trong backlog (chưa làm)."
+)
 
 conn = get_connection()
 dicts = get_dictionaries()
@@ -310,11 +319,18 @@ with tab_d3:
 with tab_d4:
     st.subheader(t("glossary.d4_header"))
     st.caption(t("glossary.d4_caption"))
+    st.info(
+        "v1.3.1: D4 không còn là \"loại thủ thuật tham khảo\" (P01-P24 cũ) mà là nguồn chọn candidate "
+        "trực tiếp (V1-ROUTE). 2 cột mới `候補にするか` / `A13投与経路` cho biết medical_class nào được "
+        "tính là candidate."
+    )
     d4_df = pd.DataFrame([
         {
             t("col.row_type"): r["row_type"],
             t("col.code"): r["name_or_code"],
             t("col.category"): r["category"],
+            "候補にするか (v1.3.1)": r.get("candidate_eligible_v1_3_1", ""),
+            "A13投与経路 (v1.3.1)": r.get("route_class_a13_v1_3_1", ""),
             t("col.description"): r["description"],
             t("col.confirmation_status"): r["confirmation_status"],
             t("col.source"): r["source_ref"],
@@ -363,9 +379,10 @@ with tab_oq:
     st.caption(t("glossary.oq_source"))
 
 st.divider()
-v1, v2, v3, v4 = st.columns(4)
+v1, v2, v3, v4, v5 = st.columns(5)
 v1.metric("D1", dicts.d1.version)
 v2.metric("D2", dicts.d2.version)
 v3.metric("D3", dicts.d3.version)
 v4.metric("D4", dicts.d4.version)
+v5.metric("D6 (DRAFT)", dicts.d6.version)
 st.caption(t("glossary.version_footer"))

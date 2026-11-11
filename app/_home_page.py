@@ -72,11 +72,12 @@ st.dataframe(df, width="stretch", hide_index=True)
 
 st.divider()
 st.subheader(t("home.dict_version_header"))
-v1, v2, v3, v4 = st.columns(4)
+v1, v2, v3, v4, v5 = st.columns(5)
 v1.metric(t("home.metric_d1"), dicts.d1.version)
 v2.metric(t("home.metric_d2"), dicts.d2.version)
 v3.metric(t("home.metric_d3"), dicts.d3.version)
 v4.metric(t("home.metric_d4"), dicts.d4.version)
+v5.metric("D6 (DRAFT)", dicts.d6.version)
 st.caption(t("glossary.version_footer"))
 
 st.page_link("pages/1_Tim_kiem.py", label=t("home.link_search"), icon="🔎")
