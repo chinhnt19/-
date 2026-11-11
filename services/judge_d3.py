@@ -2,22 +2,36 @@
 APPLY-1..5 (D3_judgment.csv APPLICATION_RULE rows; dictionary_specification.md
 §6; 03_candidate_extraction_algorithm_vn.md §6).
 
-Only called for candidates with in_q30=Y (09_data_dictionary_vn.csv:
-d3_judgment_code is NA otherwise) -- see module docstring note below on the
-two synthetic matrix rows.
+v1.3.1 status: the matrix/groups/application-rule content is unchanged
+from v1.0 (source confirms this), but its MEANING changed from "is this
+candidate in the main analysis" to "what order should the reviewer look
+at this candidate in" (検索ツール辞書v1.3.1.xlsx D3_判定コード). Candidate
+selection no longer depends on this module at all -- v1.3.1 candidates
+come purely from services/build_candidates.py (V1-DRUG AND V1-ROUTE).
+This module is kept as an OPTIONAL reviewer-facing priority hint; it is
+not called from build_candidates.py or any export. Whether the dashboard
+should surface it is an open item (deliverables/session00/15_addendum_
+v1.3.1_migration_plan_2026-11-11.md §6) -- wire it up only after that is
+confirmed, don't let the fact that this function exists imply the
+decision was already made.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from services.dictionaries import D3Dictionary
-from rules.q_conditions import (
-    Q10_D1_CATEGORIES as _MAIN8,
-    D3_URVIBI_CATEGORIES as _URVIBI,
-    D3_ROW_URVIBI,
-    D3_ROW_NO_RESPIRATORY,
-    D3_ROW_PS_PB_PG,
-)
+
+# D1 categories whose disease name alone is enough to put a patient on the
+# "PS・PB・PG"-family rows of the D3 matrix, vs. the two synthetic rows
+# below for weaker/no respiratory-disease-name evidence. This grouping is
+# purely about which D3 matrix row to look up -- it has no bearing on
+# whether a record is a v1.3.1 candidate (that's rules.q_conditions'
+# V1-DRUG/V1-ROUTE, an unrelated axis).
+_MAIN8 = frozenset({"PS", "PB", "PG", "PA", "PL", "PV", "LB", "Q"})
+_URVIBI = frozenset({"UR", "VI", "BI"})
+D3_ROW_URVIBI = "UR・VI・BIのみ"
+D3_ROW_NO_RESPIRATORY = "呼吸器感染症の病名なし"
+D3_ROW_PS_PB_PG = "PS・PB・PG"
 
 _PRIORITY = {"A": 3, "B": 2, "C": 1, "X": 0}
 _DOWNGRADE = {"A": "B", "B": "C", "C": "C", "X": "X"}

@@ -1,115 +1,112 @@
-"""Outcome-level aggregation per CSV Design Guide v1.1 §5/§9 -- the
-"研究目的の最終集計" layer that, as of the 2026-11-08 session00 assessment
-(deliverables/session00/12_danh_gia_dap_ung_csv_v1.1_2026-11-08.md §5.4),
-had zero code anywhere, including the dashboard.
+"""Outcome-level aggregation per CSV設計説明書v1.3.1 §8 ("集計への受け渡し").
 
-Operates only on supplementary-export-shaped episode rows (one dict per
-episode_id, the shape produced by `exports.supplementary_export.
-build_supplementary_export`) -- never on raw DB rows, and never computes
-case_status/day0_date/outcome_type itself (CLAUDE.md muc 3): those are
-always a human reviewer's values, taken as given, not re-derived here.
+Operates only on reviewer-filled episode rows (one dict per episode_id,
+B column names from models.csv_schemas.MANUAL_REVIEW_COLUMNS plus C01
+qc_status) -- never on raw DB rows, and never computes case_status/
+day0_date/outcome_type itself (CLAUDE.md muc 3): those are always a
+human reviewer's values, taken as given, not re-derived here.
 
-Deliberately NOT modelled yet (needs more than this module can decide):
-the §6 "reject-loop" refinement -- "3 転帰 all 'なし' but follow-up
-confirmation insufficient" should go back to primary review and only
-become 確認不能(U) if that doesn't resolve it (per the v1.1 text itself,
-not an invented rule). That needs a Session04-approved spec plus the
-B12/B15/B16 vocab mapping (UNDECIDED-S05-12), neither of which exists yet
-(deliverables/session00/11_addendum_csv_v1.1_revision_plan_2026-11-08.md
-§6, §10 last bullet). Until then, an episode where all 3 outcomes are "N"
-is always counted here as 複合「なし」.
+v1.3.1 replaces the old v1.1 B17 "集計保留フラグ" mechanism (4 free-text
+codes on an already-対象 episode) with a plain third B02 case_status
+value, 保留, that is mutually exclusive with 対象/対象外 -- so there is no
+longer a flag column to parse, just a value to filter on. See
+dictionaries/D6_case_status_reasons.csv for the (still-DRAFT) B03 reason
+taxonomy and its explicit "保留 rows excluded from the denominator" rule.
 """
 from __future__ import annotations
 
-import re
+_CASE_STATUS_TARGET = "対象"
+_CASE_STATUS_HELD = "保留"
+_QC_OK = frozenset({"問題なし", "修正確認済"})
 
-# The 4 "集計保留フラグ" codes (v1.1 §5/§9, verbatim): episodes carrying
-# one of these in B17 are excluded from the official denominator T and
-# reported separately, pending research-lead approval of the matching
-# judgment rule. This list is itself "暫定" per the document's own text --
-# see deliverables/session00/11_addendum_csv_v1.1_revision_plan_2026-11-08.md
-# §6 ("Danh sách 4 mã ... có phải danh sách cuối cùng").
-HOLD_FLAG_CODES = frozenset({
-    "EPISODE_BOUNDARY_REVIEW", "OVERLAPPING_WINDOWS",
-    "SAME_DAY_ORDER_UNCLEAR", "BASELINE_CARE_PLAN",
-})
-
-_SUBJECT_CASE_STATUS = "対象"
-
-
-def _parse_flags(context_review_flags: str) -> set[str]:
-    """B17 is free-text pass-through with no enforced separator yet (no
-    validation exists against dictionaries/D5_context_flags.csv either) --
-    split defensively on common delimiters rather than assuming one."""
-    return {tok.strip().upper() for tok in re.split(r"[;,/\s]+", context_review_flags or "") if tok.strip()}
-
-
-def has_hold_flag(context_review_flags: str) -> bool:
-    """True if B17 contains any of the 4 集計保留フラグ codes (v1.1 §5)."""
-    return bool(_parse_flags(context_review_flags) & HOLD_FLAG_CODES)
+_PRESENT, _ABSENT, _UNKNOWN = "あり", "なし", "不明"
 
 
 def composite_event_30d(admission_30d: str, transport_30d: str, death_30d: str) -> str:
-    """複合急変 3値規則 (CSV Design Guide v1.1 §9, verbatim):
-    ① あり -- admission/transport/death のいずれかが「あり」（他が不明でも可）。
-    ② なし -- 3転帰すべて「なし」。
-    ③ 確認不能 -- otherwise.
-    See module docstring for the one refinement (reject-loop) deliberately
-    not modelled -- a fully-"N" episode is always ② here."""
+    """複合転帰 3値規則 (CSV設計説明書v1.3.1 §8, verbatim):
+    あり -- 3つの転帰のどれかが「あり」（ほかが「不明」でもよい）。
+    なし -- 3つの転帰がすべて「なし」。
+    確認不能 -- 上のどちらにも当たらない。"""
     values = (admission_30d, transport_30d, death_30d)
-    if "Y" in values:
-        return "あり"
-    if all(v == "N" for v in values):
-        return "なし"
+    if _PRESENT in values:
+        return _PRESENT
+    if all(v == _ABSENT for v in values):
+        return _ABSENT
     return "確認不能"
 
 
-def split_by_hold_flag(episodes: list[dict]) -> tuple[list[dict], list[dict]]:
-    """Per v1.1 §5/§9: episodes with a 集計保留フラグ in B17 are excluded
-    from the official denominator T and reported separately, never dropped
-    silently. Returns (included_in_T, held_back)."""
-    included, held = [], []
+def split_target_held_excluded(episodes: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+    """B02 (case_status) partitions episodes into 対象/保留/対象外. 保留 rows
+    are reported separately and never enter the deterioration-rate
+    denominator (CSV設計説明書v1.3.1 §8, 診療録レビューの判定基準v1.3.1 §4)."""
+    target, held, excluded = [], [], []
     for ep in episodes:
-        (held if has_hold_flag(ep.get("context_review_flags", "")) else included).append(ep)
-    return included, held
+        status = ep.get("case_status", "")
+        if status == _CASE_STATUS_TARGET:
+            target.append(ep)
+        elif status == _CASE_STATUS_HELD:
+            held.append(ep)
+        else:
+            excluded.append(ep)
+    return target, held, excluded
+
+
+def _qc_passed(episodes: list[dict]) -> list[dict]:
+    """集計に使う行 (CSV設計説明書v1.3.1 §8): B02＝対象で、C01が「問題なし」
+    または「修正確認済」の行だけ。"""
+    return [ep for ep in episodes if ep.get("qc_status") in _QC_OK]
 
 
 def _rate(numerator: int, denominator: int) -> float | None:
     return (numerator / denominator * 100) if denominator else None
 
 
+def _individual_rate(episodes: list[dict], key: str) -> float | None:
+    vals = [e.get(key, "") for e in episodes]
+    return _rate(vals.count(_PRESENT), vals.count(_PRESENT) + vals.count(_ABSENT))
+
+
 def compute_outcome_rates(episodes: list[dict]) -> dict:
-    """episodes: supplementary-export-shaped dicts (one per episode_id).
+    """episodes: reviewer-filled dicts, one per episode_id (B01-B22 + C01).
 
-    Per v1.1 §9: only case_status == "対象" episodes enter the official
-    denominator T ("対象エピソード総数T"); among those, episodes carrying a
-    集計保留フラグ are excluded from T and counted in held_back_count
-    instead (see split_by_hold_flag), not discarded.
-
-    割合 (per v1.1 §9, verbatim): 複合あり÷（複合あり＋複合なし）×100；
-    確認不能割合は全対象件数（= T）を分母；個別転帰（入院/搬送/死亡）は各々
-    あり÷（あり＋なし）で別計算。
+    Mục 5 #1 (addendum 15) is still open: whether 入院 (admission_30d) for
+    the official deterioration-rate denominator means "all admissions" or
+    "unplanned only" (B12=予定外) has not been decided by the project
+    owner/PI. 手順書v1.3.1 §6.1 itself says to compute both until that is
+    settled -- so this function always returns both, clearly labeled, and
+    never silently picks one.
     """
-    subject = [e for e in episodes if e.get("case_status") == _SUBJECT_CASE_STATUS]
-    included, held = split_by_hold_flag(subject)
+    target, held, excluded = split_target_held_excluded(episodes)
+    included = _qc_passed(target)
 
-    composite = [
+    composite_all = [
         composite_event_30d(e.get("admission_30d", ""), e.get("transport_30d", ""), e.get("death_30d", ""))
         for e in included
     ]
-    n_ari, n_nashi, n_fukaku = composite.count("あり"), composite.count("なし"), composite.count("確認不能")
+    unplanned_admission = [_PRESENT if e.get("admission_type") == "予定外" else _ABSENT for e in included]
+    composite_unplanned_only = [
+        composite_event_30d(a, e.get("transport_30d", ""), e.get("death_30d", ""))
+        for a, e in zip(unplanned_admission, included)
+    ]
 
-    def _individual_rate(key: str) -> float | None:
-        vals = [e.get(key, "") for e in included]
-        return _rate(vals.count("Y"), vals.count("Y") + vals.count("N"))
+    def _summary(composite: list[str]) -> dict:
+        n_ari, n_nashi, n_fukaku = composite.count(_PRESENT), composite.count(_ABSENT), composite.count("確認不能")
+        return {
+            "composite_ari": n_ari, "composite_nashi": n_nashi, "composite_fukaku": n_fukaku,
+            "composite_rate_percent": _rate(n_ari, n_ari + n_nashi),
+            "fukaku_rate_percent": _rate(n_fukaku, len(included)),
+        }
 
     return {
         "denominator_t": len(included),
         "held_back_count": len(held),
-        "composite_ari": n_ari, "composite_nashi": n_nashi, "composite_fukaku": n_fukaku,
-        "composite_rate_percent": _rate(n_ari, n_ari + n_nashi),
-        "fukaku_rate_percent": _rate(n_fukaku, len(included)),
-        "admission_rate_percent": _individual_rate("admission_30d"),
-        "transport_rate_percent": _individual_rate("transport_30d"),
-        "death_rate_percent": _individual_rate("death_30d"),
+        "excluded_count": len(excluded),
+        "qc_not_passed_count": len(target) - len(included),
+        # 入院の定義1: すべての入院 (手順書v1.3.1 §6.1)
+        "all_admissions": _summary(composite_all),
+        # 入院の定義2: 予定外の入院だけ (手順書v1.3.1 §6.1) -- Mục 5 #1 open
+        "unplanned_admissions_only": _summary(composite_unplanned_only),
+        "admission_rate_percent": _individual_rate(included, "admission_30d"),
+        "transport_rate_percent": _individual_rate(included, "transport_30d"),
+        "death_rate_percent": _individual_rate(included, "death_30d"),
     }

@@ -64,11 +64,12 @@ def load_d1(path: Path = DICT_DIR / "D1_disease.csv") -> D1Dictionary:
     categories: list[D1Category] = []
     match_terms: dict[str, list[D1MatchTerm]] = {}
     exclusion_terms: dict[str, list[str]] = {}
-    version = "unknown"
+    versions_seen: set[str] = set()
 
     with open(path, encoding="utf-8-sig") as f:
         for row in csv.DictReader(f):
-            version = row["version"] or version
+            if row["version"]:
+                versions_seen.add(row["version"])
             row_type = row["row_type"]
             if row_type == "MODIFIER":
                 modifiers.append(D1Modifier(id=row["id"], pattern=row["pattern_or_term"], status=row["status"]))
@@ -87,6 +88,12 @@ def load_d1(path: Path = DICT_DIR / "D1_disease.csv") -> D1Dictionary:
                 exclusion_terms.setdefault(code, []).append(row["exclusion_term"])
 
     categories.sort(key=lambda c: c.order)
+    # D1_disease.csv now mixes v1.0 rows (content unchanged, e.g. disease-
+    # name match terms) with v1.3.1 rows (CATEGORY status/disposition, M07) --
+    # a plain "last row wins" scalar would be order-dependent and wrong.
+    # The file's overall version is its highest row version (lexicographic
+    # max works here: "v1.3.1" > "v1.0").
+    version = max(versions_seen) if versions_seen else "unknown"
     return D1Dictionary(
         version=version, modifiers=modifiers, categories=categories,
         match_terms=match_terms, exclusion_terms=exclusion_terms,
@@ -175,14 +182,22 @@ class D3Dictionary:
 
 
 def load_d3(path: Path = DICT_DIR / "D3_judgment.csv") -> D3Dictionary:
+    """NOTE (v1.3.1): judgment_codes (A/B/C/X) now mean "review order/
+    priority" per 検索ツール辞書v1.3.1.xlsx D3_判定コード, not "main-analysis
+    inclusion" as in v1.0 -- groups/matrix/application_rules content is
+    unchanged (source confirms 判定表 unchanged). This dictionary is loaded
+    for services/judge_d3.py, which is kept as an optional reviewer-facing
+    priority hint, not wired into services/build_candidates.py -- whether
+    the dashboard should surface it is an open item (addendum 15 §6)."""
     groups: dict[str, str] = {}
     judgment_codes: dict[str, str] = {}
     matrix: dict[tuple[str, str], str] = {}
     application_rules: dict[str, str] = {}
-    version = "unknown"
+    versions_seen: set[str] = set()
     with open(path, encoding="utf-8-sig") as f:
         for row in csv.DictReader(f):
-            version = row["version"] or version
+            if row["version"]:
+                versions_seen.add(row["version"])
             row_type = row["row_type"]
             if row_type == "ANTIBIOTIC_GROUP":
                 groups[row["key1"]] = row["value_or_code"]
@@ -192,6 +207,7 @@ def load_d3(path: Path = DICT_DIR / "D3_judgment.csv") -> D3Dictionary:
                 matrix[(row["key1"], row["key2"])] = row["value_or_code"]
             elif row_type == "APPLICATION_RULE":
                 application_rules[row["key1"]] = row["description"]
+    version = max(versions_seen) if versions_seen else "unknown"
     return D3Dictionary(
         version=version, groups=groups, judgment_codes=judgment_codes,
         matrix=matrix, application_rules=application_rules,
@@ -208,6 +224,12 @@ class D4Entry:
     description: str
     evidence_type: str
     confirmation_status: str
+    # v1.3.1 D4_注射区分 columns -- only populated for row_type=="INJECTION_TYPE"
+    # (P01-P11); empty string for INFUSION_INSTRUCTION_RULE/OUTCOME_HINT rows,
+    # which v1.3.1 no longer uses for candidate/outcome signals (see their
+    # confirmation_status note).
+    candidate_eligible_v1_3_1: str  # "はい" | "いいえ" | ""
+    route_class_a13_v1_3_1: str  # "静注" | "点滴静注" | "―" | ""
 
 
 @dataclass(frozen=True)
@@ -215,18 +237,25 @@ class D4Dictionary:
     version: str
     entries: list[D4Entry]
 
+    def injection_types(self) -> list[D4Entry]:
+        return [e for e in self.entries if e.row_type == "INJECTION_TYPE"]
+
 
 def load_d4(path: Path = DICT_DIR / "D4_procedure.csv") -> D4Dictionary:
     entries: list[D4Entry] = []
-    version = "unknown"
+    versions_seen: set[str] = set()
     with open(path, encoding="utf-8-sig") as f:
         for row in csv.DictReader(f):
-            version = row["version"] or version
+            if row["version"]:
+                versions_seen.add(row["version"])
             entries.append(D4Entry(
                 row_type=row["row_type"], id=row["id"], category=row["category"],
                 name_or_code=row["name_or_code"], description=row["description"],
                 evidence_type=row["evidence_type"], confirmation_status=row["confirmation_status"],
+                candidate_eligible_v1_3_1=row.get("candidate_eligible_v1_3_1", ""),
+                route_class_a13_v1_3_1=row.get("route_class_a13_v1_3_1", ""),
             ))
+    version = max(versions_seen) if versions_seen else "unknown"
     return D4Dictionary(version=version, entries=entries)
 
 
@@ -261,13 +290,54 @@ def load_d5(path: Path = DICT_DIR / "D5_context_flags.csv") -> D5Dictionary:
     return D5Dictionary(version=version, flags=flags)
 
 
+# --------------------------------------------------------------------------- D6 (v1.3.1, DRAFT)
+@dataclass(frozen=True)
+class D6CaseReason:
+    id: str
+    b02_status: str  # 対象 | 対象外 | 保留
+    reason_text_jp: str
+    excluded_from_outcome_denominator: bool
+
+
+@dataclass(frozen=True)
+class D6Dictionary:
+    version: str
+    reasons: list[D6CaseReason]  # CASE_REASON rows only (not the CASE_STATUS/NOTE rows)
+
+    def reasons_for(self, b02_status: str) -> list[D6CaseReason]:
+        return [r for r in self.reasons if r.b02_status == b02_status]
+
+
+def load_d6(path: Path = DICT_DIR / "D6_case_status_reasons.csv") -> D6Dictionary:
+    """D6 is DRAFT -- the B03 reason list is not yet formally approved by
+    the project owner (deliverables/session00/15_addendum_v1.3.1_migration_
+    plan_2026-11-11.md Mục 5 #3). Used for UI reference/display only;
+    nothing in this app auto-fills or validates a reviewer's B03 entry
+    against this list."""
+    reasons: list[D6CaseReason] = []
+    versions_seen: set[str] = set()
+    with open(path, encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            if row["version"]:
+                versions_seen.add(row["version"])
+            if row["row_type"] != "CASE_REASON":
+                continue
+            reasons.append(D6CaseReason(
+                id=row["id"], b02_status=row["b02_status"], reason_text_jp=row["reason_text_jp"],
+                excluded_from_outcome_denominator=row["excluded_from_outcome_denominator"] == "yes",
+            ))
+    version = max(versions_seen) if versions_seen else "unknown"
+    return D6Dictionary(version=version, reasons=reasons)
+
+
 @dataclass(frozen=True)
 class AllDictionaries:
     d1: D1Dictionary
     d2: D2Dictionary
     d3: D3Dictionary
     d4: D4Dictionary
+    d6: D6Dictionary
 
 
 def load_all() -> AllDictionaries:
-    return AllDictionaries(d1=load_d1(), d2=load_d2(), d3=load_d3(), d4=load_d4())
+    return AllDictionaries(d1=load_d1(), d2=load_d2(), d3=load_d3(), d4=load_d4(), d6=load_d6())
