@@ -1,0 +1,13 @@
+document/
+backup/
+
+CLAUDE.md
+desktop.ini
+*.md
+/.*
+
+__pycache__/
+*.pyc
+.venv/
+reference/
+
