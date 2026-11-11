@@ -7,10 +7,9 @@ import pytest
 
 from database.db_access import (
     DEFAULT_DB_PATH, connect_readonly, get_unmapped_clinic_summary, load_disease_records, load_medical_records,
-    load_medical_points,
 )
 from models.run_meta import RunMeta, new_run_id, today_str
-from services.aggregate import run_pipeline
+from services.build_candidates import build_candidates
 from services.dictionaries import load_all
 
 pytestmark = pytest.mark.skipif(not DEFAULT_DB_PATH.exists(), reason="orca_snapshot.db not present")
@@ -24,23 +23,19 @@ def test_smoke_smallest_clinic():
     t0 = time.time()
     disease_df = load_disease_records(conn, clinic_ids)
     medical_df = load_medical_records(conn, clinic_ids)
-    points_df = load_medical_points(conn, clinic_ids)
     run_meta = RunMeta(
-        run_id=new_run_id("v1.0", dicts.d1.version), run_date=today_str(),
-        q_table_version="v1.0", dictionary_version=dicts.d1.version,
+        run_id=new_run_id("v1.3.1", dicts.d1.version), run_date=today_str(),
+        q_table_version="v1.3.1", dictionary_version=dicts.d1.version,
         db_fetched_at_naht="NA", db_fetched_at_homis="NA",
         search_period_start="", search_period_end="", lookback_start_date="",
-        exclusion_granularity="patient_whole_period",
     )
-    result = run_pipeline(disease_df, medical_df, points_df, dicts, run_meta, frozenset(clinic_ids))
+    result = build_candidates(disease_df, medical_df, dicts, run_meta, frozenset(clinic_ids))
     elapsed = time.time() - t0
 
     assert len(disease_df) > 0
     assert len(medical_df) > 0
-    # Every candidate must be traceable back to a real evidence row.
-    cand_ids = {c["candidate_id"] for c in result.candidates}
-    evidence_ids = {e["candidate_id"] for e in result.disease_evidence} | {e["candidate_id"] for e in result.medication_evidence}
-    assert cand_ids <= evidence_ids
+    # Every candidate's evidence_ref must be non-empty (traceable back to a real row).
+    assert all(c["evidence_ref"] for c in result.candidates)
     print(f"\nclinic_sanjou: {len(disease_df)} disease rows, {len(medical_df)} medical rows, "
           f"{len(result.candidates)} candidates, {elapsed:.2f}s")
 

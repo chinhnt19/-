@@ -57,6 +57,21 @@ def _qc_passed(episodes: list[dict]) -> list[dict]:
     return [ep for ep in episodes if ep.get("qc_status") in _QC_OK]
 
 
+def _unplanned_only_admission(episode: dict) -> str:
+    """B12 (admission_type) only has meaning when B10=あり. Definition 2
+    (手順書v1.3.1 §6.1): a PLANNED admission doesn't count as an event; an
+    admission whose type is unrecorded is 不明, not あり (never assume
+    unplanned by default)."""
+    if episode.get("admission_30d") != _PRESENT:
+        return episode.get("admission_30d", "")
+    admission_type = episode.get("admission_type")
+    if admission_type == "予定外":
+        return _PRESENT
+    if admission_type == "予定":
+        return _ABSENT
+    return "不明"
+
+
 def _rate(numerator: int, denominator: int) -> float | None:
     return (numerator / denominator * 100) if denominator else None
 
@@ -83,7 +98,7 @@ def compute_outcome_rates(episodes: list[dict]) -> dict:
         composite_event_30d(e.get("admission_30d", ""), e.get("transport_30d", ""), e.get("death_30d", ""))
         for e in included
     ]
-    unplanned_admission = [_PRESENT if e.get("admission_type") == "予定外" else _ABSENT for e in included]
+    unplanned_admission = [_unplanned_only_admission(e) for e in included]
     composite_unplanned_only = [
         composite_event_30d(a, e.get("transport_30d", ""), e.get("death_30d", ""))
         for a, e in zip(unplanned_admission, included)
