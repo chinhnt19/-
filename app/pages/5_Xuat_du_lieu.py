@@ -12,11 +12,15 @@ for _p in (_APP_DIR, _ROOT_DIR):
 import pandas as pd
 import streamlit as st
 
+from _bootstrap import get_clinic_master_cached
+from exports.excel_export import df_to_excel_bytes, sanitize_filename_component, split_by_facility
 from exports.export_csv import build_candidate_csv, build_column_dictionary_csv
 from exports.qc_checks import check_all
 from exports.review_template import build_review_csv_blank
 from review_import import parse_review_csv
 from services.i18n import language_selector, t
+
+_XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 st.set_page_config(page_title="Xuất dữ liệu — AGRI CARE", layout="wide")
 language_selector()
@@ -45,17 +49,36 @@ cache = st.session_state.get("export_csv_cache")
 if cache is None or cache["run_id"] != run_id:
     st.info(t("export.not_created_info"))
 else:
-    c1, c2 = st.columns(2)
-    with c1:
-        st.download_button(
-            t("export.dl_candidate_v131_button"), cache["df_a"].to_csv(index=False).encode("utf-8-sig"),
-            file_name=f"candidate_{run_id}.csv", mime="text/csv",
-        )
-    with c2:
-        st.download_button(
-            t("export.dl_review_v131_button"), cache["df_full"].to_csv(index=False).encode("utf-8-sig"),
-            file_name=f"review_{run_id}.csv", mime="text/csv",
-        )
+    candidate_by_clinic = split_by_facility(cache["df_a"])
+    review_by_clinic = split_by_facility(cache["df_full"])
+    facility_ids = sorted(set(candidate_by_clinic) | set(review_by_clinic))
+    if not facility_ids:
+        st.info(t("export.no_candidates_info"))
+    else:
+        clinic_master = get_clinic_master_cached()
+        clinic_names = dict(zip(clinic_master["clinic_id"], clinic_master["clinic_name"]))
+        st.caption(t("export.per_clinic_caption", n=len(facility_ids)))
+        for facility_id in facility_ids:
+            clinic_name = clinic_names.get(facility_id, facility_id)
+            safe_name = sanitize_filename_component(clinic_name)
+            st.markdown(f"**{clinic_name}** (`{facility_id}`)")
+            c1, c2 = st.columns(2)
+            with c1:
+                cdf = candidate_by_clinic.get(facility_id)
+                if cdf is not None:
+                    st.download_button(
+                        t("export.dl_candidate_v131_button"), df_to_excel_bytes(cdf, sheet_name="candidate"),
+                        file_name=f"candidate_{run_id}_{safe_name}.xlsx", mime=_XLSX_MIME,
+                        key=f"dl_candidate_{facility_id}",
+                    )
+            with c2:
+                rdf = review_by_clinic.get(facility_id)
+                if rdf is not None:
+                    st.download_button(
+                        t("export.dl_review_v131_button"), df_to_excel_bytes(rdf, sheet_name="review"),
+                        file_name=f"review_{run_id}_{safe_name}.xlsx", mime=_XLSX_MIME,
+                        key=f"dl_review_{facility_id}",
+                    )
 
 st.caption(t("export.col_dict_caption"))
 dict_df = build_column_dictionary_csv()

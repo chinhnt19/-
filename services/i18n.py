@@ -1041,12 +1041,21 @@ _STRINGS: dict[str, dict[str, str]] = {
         "vi": "Bấm 'Tạo file CSV' ở trên để tạo file tải xuống cho lần chạy hiện tại.",
         "ja": "上の「CSVファイルを作成」を押すと、今回の実行結果のダウンロードファイルを作成します。",
     },
+    "export.per_clinic_caption": {
+        "vi": "File tải xuống đã lọc theo từng cơ sở ({n} cơ sở) — tên file có ghi tên cơ sở, dạng Excel (.xlsx).",
+        "ja": "ダウンロードファイルは施設ごとに分割されています（{n}施設）— ファイル名に施設名を記載、"
+              "Excel形式（.xlsx）です。",
+    },
+    "export.no_candidates_info": {
+        "vi": "Không có candidate nào trong lần chạy này để tạo file.",
+        "ja": "今回の実行には、ファイルを作成する候補がありません。",
+    },
     "export.dl_candidate_v131_button": {
-        "vi": "⬇ Candidate (17 cột A, chỉ tool)", "ja": "⬇ 候補（Aの17列のみ、ツール出力）",
+        "vi": "⬇ Candidate (17 cột A, chỉ tool, .xlsx)", "ja": "⬇ 候補（Aの17列のみ、ツール出力、.xlsx）",
     },
     "export.dl_review_v131_button": {
-        "vi": "⬇ File review (41 cột, A đã điền + B/C trống)",
-        "ja": "⬇ レビューファイル（41列、A記入済み＋B/C空欄）",
+        "vi": "⬇ File review (41 cột, A đã điền + B/C trống, .xlsx)",
+        "ja": "⬇ レビューファイル（41列、A記入済み＋B/C空欄、.xlsx）",
     },
     "export.col_dict_caption": {
         "vi": "📖 File riêng giải thích ý nghĩa 41 cột bằng tiếng Nhật, lấy nguyên văn từ "
