@@ -14,8 +14,12 @@ if str(ROOT) not in sys.path:
 
 import streamlit as st  # noqa: E402
 
-from database.db_access import DEFAULT_DB_PATH, connect_readonly, get_clinic_master  # noqa: E402
+from database.db_access import (  # noqa: E402
+    DEFAULT_DB_PATH, connect_readonly, get_clinic_master, get_perform_month_bounds,
+    get_table_row_counts, get_unmapped_clinic_summary,
+)
 from rules.clinic_master_overrides import apply_overrides  # noqa: E402
+from services.column_glossary import describe as describe_column  # noqa: E402
 from services.dictionaries import AllDictionaries, load_all  # noqa: E402
 
 
@@ -49,5 +53,41 @@ def get_dictionaries() -> AllDictionaries:
     return load_all()
 
 
+@st.cache_data
+def get_perform_month_bounds_cached() -> tuple[str | None, str | None]:
+    """MIN/MAX perform_month across disease_records + medical_records. Scans
+    the whole DB (no index on perform_month) -- cached so switching back to
+    this page doesn't re-run it on every navigation, only on first load."""
+    return get_perform_month_bounds(get_connection())
+
+
+@st.cache_data
+def get_table_row_counts_cached() -> dict[str, int]:
+    """COUNT(*) over 4 tables -- cached so visiting the glossary page doesn't
+    re-scan the whole DB on every navigation, only on first load."""
+    return get_table_row_counts(get_connection())
+
+
+@st.cache_data
+def get_unmapped_clinic_summary_cached() -> "pd.DataFrame":  # noqa: F821
+    """Correlated-subquery scan over 3 tables -- same cache rationale as
+    get_table_row_counts_cached()."""
+    return get_unmapped_clinic_summary(get_connection())
+
+
 def known_clinic_ids() -> frozenset[str]:
     return frozenset(get_clinic_master_cached()["clinic_id"])
+
+
+def column_help_config(columns: list[str]) -> dict[str, "st.column_config.Column"]:
+    """`column_config=` for st.dataframe(): hover-tooltip on each column header
+    showing its Japanese description from services.column_glossary (CSV設計
+    説明書v1.3.1 §4). Columns with no glossary entry (e.g. a derived display
+    column like "候補グループ") are left out, so st.dataframe falls back to
+    its default header for those."""
+    config = {}
+    for col in columns:
+        help_text = describe_column(col)
+        if help_text:
+            config[col] = st.column_config.Column(help=help_text)
+    return config

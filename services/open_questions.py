@@ -19,6 +19,16 @@ nếu cần đầy đủ cả 5 phần.
 
 Mỗi mục giữ nguyên trạng thái như ghi trong tài liệu gốc (status_raw, tiếng
 Anh, nguyên văn) để tra cứu chéo -- không tự nâng mục nào lên "đã xác minh".
+
+Mục D (thêm 2026-11-12, nguồn riêng -- KHÔNG từ 08_unresolved_decisions_
+register.md ở trên): trạng thái migrate sang model v1.3.1 (1 trục
+D4_注射区分 + group theo tháng, thay 3-trục Q10/Q20/Q30/D3-matrix cũ ở mục
+A/B/C bên trên). Lấy trực tiếp, không diễn giải thêm, từ Mục 0 ("Đã giải
+quyết" + "Còn tồn đọng") và Mục 5 ("Decisions required") của
+deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md --
+addendum này tự ghi rõ là "Phân tích khác biệt + kế hoạch sửa (plan only)",
+không tự phê duyệt mục nào; các mục đánh "✅ ĐÃ XỬ LÝ"/"Resolved" trong mục D
+dưới đây đã được xác nhận trực tiếp trong văn bản addendum đó.
 """
 from __future__ import annotations
 
@@ -42,24 +52,31 @@ class OpenQuestion:
 
 
 SECTIONS: dict[str, dict[str, str]] = {
-    "A": {"vi": "A. Quyết định nghiên cứu / lâm sàng", "ja": "A. 研究・臨床上の決定"},
-    "B": {"vi": "B. Logic tìm kiếm D1–D4 / Q / QC", "ja": "B. D1〜D4／Q／QC 検索ロジック"},
-    "C": {"vi": "C. Mô hình dữ liệu CSV / xuất dữ liệu", "ja": "C. CSVデータモデル／出力"},
+    "A": {"vi": "A. Quyết định nghiên cứu / lâm sàng (model v1.0)", "ja": "A. 研究・臨床上の決定（v1.0モデル）"},
+    "B": {"vi": "B. Logic tìm kiếm D1–D4 / Q / QC (model v1.0)", "ja": "B. D1〜D4／Q／QC 検索ロジック（v1.0モデル）"},
+    "C": {"vi": "C. Mô hình dữ liệu CSV / xuất dữ liệu (model v1.0)", "ja": "C. CSVデータモデル／出力（v1.0モデル）"},
+    "D": {
+        "vi": "D. Migrate v1.3.1 — đã giải quyết & còn tồn đọng (addendum 15, 2026-11-11)",
+        "ja": "D. v1.3.1移行 — 解決済み・未解決（addendum15、2026-11-11）",
+    },
 }
 
 SECTION_OWNERS_VI: dict[str, str] = {
     "A": "Chủ dự án / bác sĩ",
     "B": "Chủ dự án",
     "C": "Chủ dự án / phụ trách bảo mật dữ liệu",
+    "D": "Mixed — xem addendum 15 Mục 5",
 }
 
 SECTION_OWNERS_JA: dict[str, str] = {
     "A": "チーム責任者／医師",
     "B": "チーム責任者",
     "C": "チーム責任者／データ保護担当",
+    "D": "混在 — addendum15 Mục5参照",
 }
 
 SOURCE_FILE = "deliverables/session00/08_unresolved_decisions_register.md"
+SOURCE_FILE_V131 = "deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md"
 
 _OWNER_PROJECT_DOCTOR_VI = "Chủ dự án / bác sĩ"
 _OWNER_PROJECT_DOCTOR_JA = "チーム責任者／医師"
@@ -69,6 +86,8 @@ _OWNER_MASTER_DOC_VI = "Người giữ Master Document"
 _OWNER_MASTER_DOC_JA = "マスタードキュメント管理者"
 _OWNER_PROJECT_SECURITY_VI = "Chủ dự án / phụ trách bảo mật dữ liệu"
 _OWNER_PROJECT_SECURITY_JA = "チーム責任者／データ保護担当"
+_OWNER_ENGINEER_VI = "Engineer"
+_OWNER_ENGINEER_JA = "エンジニア"
 
 QUESTIONS: list[OpenQuestion] = [
     # ------------------------------------------------------------ A. Nghiên cứu/lâm sàng
@@ -267,4 +286,144 @@ QUESTIONS: list[OpenQuestion] = [
                  "追加し、フィルターから漏れないようにしたが、施設の正式名称はDB・リポジトリのどこにも存在せ"
                  "ず未確認のまま — 元のORCAシステムで確認後、`clinic_master` へ反映する必要がある。",
                  _OWNER_PROJECT_VI, _OWNER_PROJECT_JA),
+
+    # ------------------------------------------------------------ D. Migrate v1.3.1 (addendum 15)
+    # Nguồn: 15_addendum_v1.3.1_migration_plan_2026-11-11.md Mục 0 ("Đã giải quyết" + "Còn tồn
+    # đọng") và Mục 5 ("Decisions required") -- xem SOURCE_FILE_V131. Không trộn với A/B/C (model
+    # v1.0 cũ) ở trên.
+    OpenQuestion("V131-R1", "D", STATUS_RESOLVED, "Resolved (addendum 15 Mục 0, commit aee43e9/9c49b46)",
+                 "Kiến trúc trích xuất candidate đã viết lại hoàn toàn: 1 trục duy nhất (bản ghi tính tiền "
+                 "kháng sinh tiêm/truyền, lọc qua D4_注射区分) + group theo tháng liên tục — thay cho 3 trục "
+                 "Q10(病名)/Q20(薬剤)/Q30(AND)/D3-matrix cũ. Test thật: 422 candidate trên 3 clinic/~1.1M dòng DB.",
+                 "候補抽出のアーキテクチャを全面的に書き直し：D4_注射区分でフィルタした注射用抗菌薬の算定記録"
+                 "のみを使う単一軸＋連続月のグルーピングに統一（旧Q10（病名）／Q20（薬剤）／Q30（AND）／D3マ"
+                 "トリクスの3軸モデルを廃止）。3施設・実DB約110万行で試行し候補422件を抽出済み。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-R2", "D", STATUS_RESOLVED, "Resolved (commit c23c53e)",
+                 "D1/D3/D4 dictionary (+D6 mới, DRAFT) đã đồng bộ với 検索ツール辞書v1.3.1.xlsx — D4 đổi hẳn "
+                 "từ \"loại thủ thuật tham khảo P01-P24\" sang \"mã tính tiền ORCA .310-.350 → "
+                 "candidate_eligible + A13投与経路\". Nội dung bệnh danh/thành phần/điều kiện tìm không đổi.",
+                 "D1／D3／D4辞書（＋新規D6、DRAFT）を検索ツール辞書v1.3.1.xlsxに同期済み — D4は旧「参考の手"
+                 "技種別P01〜P24」から「ORCA算定コード.310〜.350→candidate_eligible＋A13投与経路」へ完全に変"
+                 "更。病名・成分・検索語・判定表の内容自体は変更なし。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-R3", "D", STATUS_RESOLVED, "Resolved (commit 3846acd/b1a6b65)",
+                 "Schema CSV mới: 1 file 41 cột thống nhất (A01-A17 tool xuất, B01-B22 reviewer nhập, C01-C02 "
+                 "QC) + 1 file covariate riêng, thay cho 6 file CSV rời (Candidate/3 Evidence/Manual Review/"
+                 "Outcome) cũ.",
+                 "新CSVスキーマ：統一41列1ファイル（ツール出力A01〜A17、レビュー入力B01〜B22、QC C01〜C02）"
+                 "＋別ファイルのcovariate、旧6分割CSV（候補／エビデンス3種／診療録レビュー／転帰）を置き換え。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-R4", "D", STATUS_RESOLVED, "Resolved (commit b1a6b65/4c9035b/74809b8)",
+                 "6 trang app/pages/*.py, exports/export_csv.py, review_template.py, qc_checks.py (V01-V09 "
+                 "mới) và toàn bộ tests/ đã viết lại theo model mới — 81 test pass (1 skip không liên quan), "
+                 "không còn import vỡ.",
+                 "app/pages/*.pyの6ページ、exports/export_csv.py、review_template.py、新規qc_checks.py"
+                 "（V01〜V09）、tests/一式を新モデルに合わせて書き直し済み — テスト81件成功（無関係なスキッ"
+                 "プ1件）、importの破損なし。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-R5", "D", STATUS_RESOLVED, "✅ ĐÃ XỬ LÝ (commit b2041e5, 2026-11-11)",
+                 "Rủi ro tuân thủ dữ liệu cá nhân: scripts/build_reference.py (đọc patient_name trực tiếp, "
+                 "không mode=ro, ghi ra reference/*.csv không nằm trong .gitignore) đã bị xoá. Đã xác nhận "
+                 "reference/ chưa từng bị commit.",
+                 "個人情報コンプライアンスリスク：scripts/build_reference.py（patient_nameを直接読み取り、"
+                 "mode=roなし、.gitignore対象外のreference/*.csvへ出力）を削除済み。reference/ ディレクトリが"
+                 "コミットされたことは一度もないことを確認済み。",
+                 _OWNER_PROJECT_SECURITY_VI, _OWNER_PROJECT_SECURITY_JA),
+    OpenQuestion("V131-R6", "D", STATUS_RESOLVED, "✅ ĐÃ XỬ LÝ (2026-11-11, xác nhận bởi chủ dự án)",
+                 "CLAUDE.md §2 (nguồn ưu tiên) đã được chủ dự án xác nhận cập nhật: 手順書v1.3.1.docx là 正本 "
+                 "mới, các tài liệu v1.3.1 khác xếp theo vai trò, Master Document v1.0 hạ xuống \"chỉ tham "
+                 "khảo lịch sử\".",
+                 "CLAUDE.md §2（優先ソース）はチーム責任者の確認を得て更新済み：手順書v1.3.1.docxが新しい正"
+                 "本となり、他のv1.3.1文書は役割別に整理、v1.0マスタードキュメントは「歴史的参考のみ」に格下"
+                 "げ。",
+                 _OWNER_PROJECT_VI, _OWNER_PROJECT_JA),
+    OpenQuestion("V131-T1", "D", STATUS_RESOLVED, "Resolved (cập nhật trong phiên này, 2026-11-12)",
+                 "Nội dung diễn giải trang \"Giải thích thuật ngữ\" (Tổng quan pipeline, Cách hoạt động, "
+                 "banner cảnh báo) mô tả model v1.0 cũ (Tập A/B/C, Q30, D3-certainty) — đã viết lại theo model "
+                 "v1.3.1; mục D này thay cho banner cảnh báo \"lỗi thời\" cũ.",
+                 "「用語解説」ページの説明内容（パイプライン概要、仕組み、警告バナー）が旧v1.0モデル（集合A/"
+                 "B/C、Q30、D3確からしさ）を説明していた点は、今回の更新でv1.3.1モデルに合わせて書き直し済"
+                 "み。このD項が旧警告バナーの代わりとなる。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-T2", "D", STATUS_UNVERIFIED, "Open",
+                 "Chưa tạo addendum riêng cho session 01/02/06/07/09 (deliverables Markdown) như đề xuất ở "
+                 "addendum 15 Mục 4 — chỉ phần code (dictionaries/rules/models/services/exports/app/tests) đã "
+                 "làm trực tiếp.",
+                 "addendum15 Mục4の提案どおり、session01／02／06／07／09用の個別addendum（Markdown "
+                 "deliverable）はまだ作成されていない — コード部分（dictionaries/rules/models/services/"
+                 "exports/app/tests）のみ直接実装済み。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-T3", "D", STATUS_UNVERIFIED, "Open",
+                 "Chưa chạy thử streamlit run app/Home.py thật (chỉ py_compile + test logic nền, chưa "
+                 "click-through UI).",
+                 "streamlit run app/Home.pyの実機動作確認はまだ行っていない（py_compileとロジックテストのみ"
+                 "、UIのクリック確認は未実施）。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-D1", "D", STATUS_UNVERIFIED, "Open — tài liệu nguồn chưa tồn tại",
+                 "Công thức急変率 chính thức (toàn bộ nhập viện vs chỉ ngoài kế hoạch) dùng để ước tính số "
+                 "mẫu — tài liệu thứ 5 \"急変率の計算\" chưa tồn tại trong document/A/v1.3.1/.",
+                 "サンプルサイズ推定に使う急変率の正式な計算式（入院全体 vs 予定外のみ）— 正式文書「急変率の"
+                 "計算」（5番目の公式文書）はdocument/A/v1.3.1/にまだ存在しない。",
+                 _OWNER_PROJECT_DOCTOR_VI, _OWNER_PROJECT_DOCTOR_JA),
+    OpenQuestion("V131-D2", "D", STATUS_RESOLVED,
+                 "✅ Quyết định tạm thời (có thể đổi lại) — 実施方針の概要 §6.2-2, 検索ツールの設計基準と辞書 R11",
+                 "Quyết định tạm thời (2026-11-11): KHÔNG đưa 保留 (gồm \"疑い\") vào báo cáo/tổng hợp chính "
+                 "— chỉ báo riêng held_back_count. Đã khớp code hiện tại (outcome_rates.py); có thể đổi lại "
+                 "nhanh (1 chỗ) nếu quyết định sau này thay đổi, miễn giữ cờ is_suspected tách biệt.",
+                 "暫定決定（2026-11-11）：保留（「疑い」を含む）は主報告・主集計に含めない — "
+                 "held_back_countとして別掲のみ。現行コード（outcome_rates.py）と一致しており、今後方針を変"
+                 "える場合も変更箇所は1か所のみ（is_suspectedフラグを分離した上で）で対応可能。",
+                 _OWNER_PROJECT_DOCTOR_VI, _OWNER_PROJECT_DOCTOR_JA),
+    OpenQuestion("V131-D3", "D", STATUS_UNVERIFIED, "Open",
+                 "Danh sách B03 (lý do 対象外/保留) chính thức — đã có đề xuất (xem tab D3/D4), cần phê duyệt "
+                 "là danh sách cuối, gồm cả việc có thêm \"予防投与\" làm lý do riêng hay không.",
+                 "B03（対象外／保留の理由）正式リスト — 提案はあるが、最終リストとしての承認が必要。「予防投"
+                 "与」を独立した理由として追加するかも未確定。",
+                 "Nhóm nghiên cứu", "研究チーム"),
+    OpenQuestion("V131-D4", "D", STATUS_UNVERIFIED, "Open",
+                 "Định dạng evidence_ref/day0_evidence/outcome_evidence_ref (A17/B05/B22), version病名辞書 "
+                 "dùng cho A16, và CSV có BOM hay không — chưa chốt.",
+                 "evidence_ref／day0_evidence／outcome_evidence_ref（A17／B05／B22）の形式、A16用の病名辞書"
+                 "バージョン、CSVにBOMを付けるか — 未確定。",
+                 "Engineer + Nhóm nghiên cứu", "エンジニア＋研究チーム"),
+    OpenQuestion("V131-D5", "D", STATUS_UNVERIFIED, "Open",
+                 "Quyền sử dụng dữ liệu cá nhân + đường phê duyệt (có cần xét duyệt y đức/IRB hay không) — "
+                 "chưa chốt.",
+                 "個人データの利用権限と承認フロー（倫理審査／IRBが必要か）— 未確定。",
+                 "PI / người phụ trách y đức", "PI／倫理審査担当"),
+    OpenQuestion("V131-D6", "D", STATUS_UNVERIFIED, "Open (2/9 tự kiểm tra được qua code/DB)",
+                 "9 \"未確認事項\" kỹ thuật trong 検索ツールの設計基準と辞書 §10 — 2/9 đã tự kiểm tra được qua "
+                 "đối chiếu DB thật (medication_code = mã receipt, medical_class 31/32/33 khớp 皮下筋肉注射/"
+                 "静脈注射/点滴注射), 7 mục còn lại cần bác sĩ/engineer xác nhận.",
+                 "検索ツールの設計基準と辞書§10の技術的な「未確認事項」9件のうち、2件は実データベースで確認"
+                 "済み（medication_codeはレセプトコード、medical_class 31/32/33が皮下筋肉注射／静脈注射／点"
+                 "滴注射と一致）。残り7件は医師・エンジニアによる確認が必要。",
+                 _OWNER_PROJECT_DOCTOR_VI, _OWNER_PROJECT_DOCTOR_JA),
+    OpenQuestion("V131-D9", "D", STATUS_UNVERIFIED, "Open",
+                 "Công cụ HTML cũ document/B/orca-search-standalone.html — tài liệu nói đã nghỉ hưu/lỗi "
+                 "thời, cần Engineer xác nhận không còn phụ thuộc nào trong pipeline hiện tại.",
+                 "旧HTMLツールdocument/B/orca-search-standalone.html — 文書上は退役・廃止扱いだが、現行パイ"
+                 "プラインに依存が残っていないことをエンジニアが確認する必要がある。",
+                 _OWNER_ENGINEER_VI, _OWNER_ENGINEER_JA),
+    OpenQuestion("V131-D10", "D", STATUS_UNVERIFIED, "⏳ PENDING, chủ động để ngỏ (2026-11-11)",
+                 "⏳ Chủ dự án đã xem, chủ động để ngỏ, chưa quyết — không phải bị quên: mỗi cơ sở xác nhận "
+                 "đường lấy thông tin nhập viện/tử vong khi bệnh nhân nhập viện/qua đời ở một bệnh viện khác "
+                 "(施設外) — ORCA của cơ sở theo dõi không tự động biết; quyết định trực tiếp tỉ lệ \"確認不"
+                 "能\" ở B19/転帰.",
+                 "⏳ チーム責任者は把握済みで意図的に未決定のまま — 見落としではない：患者が別の医療機関"
+                 "（施設外）で入院・死亡した場合の情報入手経路を各施設で確認する必要がある — 追跡中の施設の"
+                 "ORCAは自動では分からない。B19／転帰の「確認不能」率を直接左右する。",
+                 "Nhóm nghiên cứu + từng cơ sở", "研究チーム＋各施設"),
+    OpenQuestion("V131-D11", "D", STATUS_UNVERIFIED, "Open — đã hạ mức độ khẩn (xem addendum 15 §2.9)",
+                 "medical_points.medical_day có ngày cấp độ ngày cho 皮下筋肉注射/静脈注射/点滴注射 (31/32/"
+                 "33) nhưng CHỈ cho clinic nguồn HOMIS (0 dòng cho 11 clinic NAHT). Code hiện tại chỉ dùng "
+                 "làm \"supplementary hint\", không tự động hoá 14-day rule/Day0. Cần báo lại nhóm viết tài "
+                 "liệu v1.3.1 để xác nhận có nên tận dụng làm gợi ý hiển thị cho reviewer ở clinic HOMIS hay "
+                 "không.",
+                 "medical_points.medical_dayには皮下筋肉注射／静脈注射／点滴注射（31/32/33）の日単位の日付"
+                 "があるが、HOMIS系施設のみ（NAHT11施設は0行）。現行コードは「補助的ヒント」としてのみ使用"
+                 "し、14日ルール／Day0の自動化には使っていない。v1.3.1文書作成チームに報告し、HOMIS施設でレ"
+                 "ビュー担当者向けの表示ヒントとして活用すべきか確認が必要。",
+                 "Chủ dự án / engineer phía tài liệu", "チーム責任者／文書担当エンジニア"),
 ]

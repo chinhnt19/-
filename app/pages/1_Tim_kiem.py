@@ -13,8 +13,11 @@ import os
 
 import streamlit as st
 
-from _bootstrap import get_connection, get_clinic_master_cached, get_dictionaries, known_clinic_ids
-from database.db_access import get_perform_month_bounds, load_disease_records, load_medical_records, get_fetched_at_range
+from _bootstrap import (
+    get_connection, get_clinic_master_cached, get_dictionaries, get_perform_month_bounds_cached,
+    known_clinic_ids,
+)
+from database.db_access import load_disease_records, load_medical_records, get_fetched_at_range
 from models.run_meta import RunMeta, new_run_id, today_str
 from rules.clinic_tool_mapping import NAHT_CLINIC_IDS, clinic_group
 from services.build_candidates import build_candidates
@@ -65,7 +68,7 @@ selected_clinics = st.sidebar.multiselect(
     help=t("search.facility_help", prefix=_common_prefix),
 )
 
-month_min, month_max = get_perform_month_bounds(conn)
+month_min, month_max = get_perform_month_bounds_cached()
 st.sidebar.caption(t("search.month_range_caption", min=month_min, max=month_max))
 month_start = st.sidebar.text_input(t("search.month_start_label"), value=month_min or "")
 month_end = st.sidebar.text_input(t("search.month_end_label"), value=month_max or "")
@@ -77,21 +80,13 @@ st.session_state.filters = {"clinic_ids": selected_clinics, "month_start": month
 
 # ---------------------------------------------------------------------- Chạy
 st.title(t("search.title"))
-st.info(
-    "Model v1.3.1: 1 candidate = 1 chuỗi tháng liên tục có算定注射用抗菌薬 (静注/点滴静注) cho "
-    "1 bệnh nhân. Công cụ KHÔNG tự xác định treatment episode (quy tắc 14 ngày), Day 0, case_status "
-    "hay転帰 — việc đó do reviewer làm trên file xuất ra (xem trang Xuất dữ liệu)."
-)
-st.warning(
-    "Giới hạn dữ liệu đã biết (không phải lỗi, xem addendum v1.3.1 Mục 2.9/§6): A06 (tuổi) và A07 "
-    "(giới tính) luôn để trống — DB không có trường nhân khẩu học nào. Bệnh danh gắn vào candidate "
-    "chỉ lọc theo ngày bắt đầu, không lọc theo ngày転帰 (DB không có cột này)."
-)
+st.info(t("search.model_info"))
+st.warning(t("search.data_limit_warning"))
 
-st.caption(
-    f"Phiên bản dictionary: D1={dicts.d1.version} · D2={dicts.d2.version} · D3={dicts.d3.version} · "
-    f"D4={dicts.d4.version} · D6={dicts.d6.version} (DRAFT)"
-)
+st.caption(t(
+    "search.dict_version_caption",
+    d1=dicts.d1.version, d2=dicts.d2.version, d3=dicts.d3.version, d4=dicts.d4.version, d6=dicts.d6.version,
+))
 
 if st.button(t("search.run_button"), type="primary"):
     with st.spinner(t("search.spinner")):
@@ -114,14 +109,14 @@ if st.button(t("search.run_button"), type="primary"):
         )
         result = build_candidates(disease_df, medical_df, dicts, run_meta, known_clinic_ids())
         st.session_state.last_run_result = result
-    st.success(
-        f"Đã trích xuất {len(result.candidates)} candidate (run_id={run_meta.run_id}, "
-        f"{len(disease_df):,} dòng病名, {len(medical_df):,} dòng thuốc đã đọc)."
-    )
+    st.success(t(
+        "search.success_msg", run_id=run_meta.run_id, n_candidates=len(result.candidates),
+        n_disease=f"{len(disease_df):,}", n_medical=f"{len(medical_df):,}",
+    ))
 
 if "last_run_result" in st.session_state:
     r = st.session_state.last_run_result
-    st.caption(f"Kết quả lần chạy gần nhất: run_id={r.run_meta.run_id}, {len(r.candidates)} candidate.")
+    st.caption(t("search.last_result_caption", run_id=r.run_meta.run_id, n_candidates=len(r.candidates)))
     c1, c2 = st.columns(2)
     with c1:
         st.page_link("pages/2_Thong_ke.py", label=t("search.link_stats"), icon="📊")

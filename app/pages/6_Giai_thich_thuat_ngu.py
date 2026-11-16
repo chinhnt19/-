@@ -19,8 +19,7 @@ for _p in (_APP_DIR, _ROOT_DIR):
 import pandas as pd
 import streamlit as st
 
-from _bootstrap import get_connection, get_dictionaries
-from database.db_access import get_table_row_counts, get_unmapped_clinic_summary
+from _bootstrap import get_dictionaries, get_table_row_counts_cached, get_unmapped_clinic_summary_cached
 from services.glossary import read_csv_rows
 from services.i18n import get_lang, language_selector, t
 from services.open_questions import QUESTIONS, SECTIONS, STATUS_PROPOSED, STATUS_RESOLVED, STATUS_UNVERIFIED
@@ -30,29 +29,20 @@ language_selector()
 
 st.title(t("glossary.title"))
 st.caption(t("glossary.caption"))
-st.warning(
-    "⚠️ Các tab dưới đây (Tổng quan pipeline, Cách hoạt động — sơ đồ Venn A/B/C, Q30, D3 "
-    "\"certainty\") mô tả **model v1.0 cũ** (3 trục病名×薬剤×点滴手技), hiện KHÔNG còn đúng với "
-    "pipeline đang chạy (xem trang Tìm kiếm). Model v1.3.1 chỉ dùng 1 trục (注射用抗菌薬 AND "
-    "静注・点滴静注), nhóm theo tháng — xem `deliverables/session00/15_addendum_v1.3.1_migration_"
-    "plan_2026-11-11.md`. Nội dung các tab D1/D2/D3 (bảng dictionary) vẫn đúng/đọc trực tiếp từ "
-    "file hiện tại; chỉ phần diễn giải \"sets/certainty\" ở tab Cách hoạt động là lỗi thời. "
-    "Chưa cập nhật lại toàn bộ nội dung diễn giải — nằm trong backlog (chưa làm)."
-)
+st.info(t("glossary.model_status_banner"))
 
-conn = get_connection()
 dicts = get_dictionaries()
 
 # --------------------------------------------------------------- Tổng quan pipeline
 st.subheader(t("glossary.overview_header"))
 flow = st.columns([2, 1, 2, 1, 2, 1, 2])
-flow[0].markdown(f"**D1**\n\n{t('glossary.overview_flow_d1')}")
+flow[0].markdown(f"**D4**\n\n{t('glossary.overview_flow_d1')}")
 flow[1].markdown("### →")
-flow[2].markdown(f"**D2**\n\n{t('glossary.overview_flow_d2')}")
+flow[2].markdown(f"**Group tháng**\n\n{t('glossary.overview_flow_d2')}")
 flow[3].markdown("### →")
-flow[4].markdown(f"**Q30**\n\n{t('glossary.overview_flow_q30')}")
+flow[4].markdown(f"**D1**\n\n{t('glossary.overview_flow_q30')}")
 flow[5].markdown("### →")
-flow[6].markdown(f"**D3**\n\n{t('glossary.overview_flow_d3')}")
+flow[6].markdown(f"**Review**\n\n{t('glossary.overview_flow_d3')}")
 st.caption(t("glossary.overview_flow_d4_note"))
 
 for key in (
@@ -76,7 +66,7 @@ with tab_intro:
     st.success(t("intro.quick_answer_body"))
     st.warning(t("intro.caveat_no_signoff"))
 
-    unmapped = get_unmapped_clinic_summary(conn)
+    unmapped = get_unmapped_clinic_summary_cached()
     if not unmapped.empty:
         st.error(t("intro.orphan_title"))
         st.caption(t("intro.orphan_body"))
@@ -108,7 +98,7 @@ with tab_intro:
 
     st.divider()
     st.subheader(t("intro.db_header"))
-    counts = get_table_row_counts(conn)
+    counts = get_table_row_counts_cached()
     d1c, d2c, d3c, d4c = st.columns(4)
     d1c.metric("clinic_master", f"{counts['clinic_master']:,}", help=t("intro.db_clinic_master"))
     d2c.metric("disease_records", f"{counts['disease_records']:,}", help=t("intro.db_disease_records"))
@@ -148,27 +138,9 @@ with tab_how:
 
     st.subheader(t("how.sets_header"))
     st.markdown(t("how.sets_intro"))
-    sa, sb, sc = st.columns(3)
-    sa.markdown(t("how.set_a"))
-    sb.markdown(t("how.set_b"))
-    sc.markdown(t("how.set_c"))
-
-    _VENN_SVG = """
-    <svg viewBox="0 0 460 300" style="max-width:420px; width:100%; display:block; margin:0.6rem auto;"
-         role="img" aria-label="So do Venn 3 tap hop A, B, C">
-      <circle cx="175" cy="130" r="100" fill="none" stroke="#2e8b6f" stroke-width="2"/>
-      <circle cx="255" cy="130" r="100" fill="none" stroke="#888" stroke-width="1.6"/>
-      <circle cx="215" cy="205" r="100" fill="none" stroke="#888" stroke-width="1.6" opacity="0.8"/>
-      <text x="90" y="75" font-size="13" font-weight="700" fill="#2e8b6f">A</text>
-      <text x="315" y="75" font-size="13" font-weight="600" fill="currentColor">B</text>
-      <text x="215" y="285" font-size="13" font-weight="600" fill="currentColor" text-anchor="middle">C</text>
-      <text x="215" y="110" font-size="13" font-weight="700" fill="#2e8b6f" text-anchor="middle">A+B</text>
-      <text x="130" y="130" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.8">chỉ A</text>
-      <text x="300" y="130" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.8">chỉ B</text>
-      <text x="215" y="235" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.8">chỉ C</text>
-    </svg>
-    """
-    st.markdown(_VENN_SVG, unsafe_allow_html=True)
+    compare_old, compare_new = st.columns(2)
+    compare_old.markdown(f"**v1.0 (cũ)**\n\n{t('how.compare_old')}")
+    compare_new.markdown(f"**v1.3.1 (hiện tại)**\n\n{t('how.compare_new')}")
     st.info(t("how.sets_note"))
 
     st.divider()
@@ -199,9 +171,9 @@ with tab_how:
         ])
         st.dataframe(d5_df, hide_index=True, width="stretch")
         if d5_rows:
-            st.caption(f"D5 version: {d5_rows[0]['version']}")
+            st.caption(t("glossary.d5_version_caption", version=d5_rows[0]["version"]))
     except FileNotFoundError:
-        st.caption("dictionaries/D5_context_flags.csv chưa có trong lần chạy này.")
+        st.caption(t("glossary.d5_not_found_caption"))
 
     st.divider()
     st.subheader(t("how.patterns_header"))
@@ -319,11 +291,7 @@ with tab_d3:
 with tab_d4:
     st.subheader(t("glossary.d4_header"))
     st.caption(t("glossary.d4_caption"))
-    st.info(
-        "v1.3.1: D4 không còn là \"loại thủ thuật tham khảo\" (P01-P24 cũ) mà là nguồn chọn candidate "
-        "trực tiếp (V1-ROUTE). 2 cột mới `候補にするか` / `A13投与経路` cho biết medical_class nào được "
-        "tính là candidate."
-    )
+    st.info(t("glossary.d4_v131_info"))
     d4_df = pd.DataFrame([
         {
             t("col.row_type"): r["row_type"],

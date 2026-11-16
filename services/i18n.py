@@ -79,6 +79,21 @@ _STRINGS: dict[str, dict[str, str]] = {
               "日本語の内容は dictionaries/*.csv（マスタードキュメント v1.0）の原文のまま表示しており、"
               "医学用語のずれを避けるため翻訳はしていません。",
     },
+    "glossary.model_status_banner": {
+        "vi": "✅ Cập nhật 2026-11-12: các tab dưới đây (Tổng quan pipeline, Cách hoạt động) đã viết lại theo "
+              "model v1.3.1 — 1 điều kiện lọc duy nhất (`D4_注射区分`) + group theo tháng liên tục; con người "
+              "(reviewer) xác định episode/Day0/case_status/転帰, tool không tự quyết. Thay cho banner cảnh báo "
+              "\"lỗi thời\" trước đây. Danh sách đầy đủ, có đánh dấu rõ **đã giải quyết** / **còn tồn đọng** "
+              "(cần chủ dự án quyết định) cho từng hạng mục của đợt migrate này nằm ở mục **D** trong tab "
+              "\"Nghi vấn & Xác nhận\" bên dưới — nguồn: `deliverables/session00/15_addendum_v1.3.1_migration_"
+              "plan_2026-11-11.md`.",
+        "ja": "✅ 2026-11-12更新：以下のタブ（パイプライン概要、仕組み）はv1.3.1モデルに合わせて書き直しました — "
+              "候補を選ぶ条件は`D4_注射区分`のフィルタ1つだけ＋連続月のグルーピング。エピソード／Day0／"
+              "case_status／転帰は人（レビュー担当者）が判断し、ツールは自動判定しません。以前の「旧モデルの"
+              "まま」という警告バナーを置き換えています。今回の移行で**解決済み**／**未解決**（チーム責任者の"
+              "決定待ち）の項目の全リストは、下の「未確認・確認済み事項」タブのD項にあります — 出典："
+              "`deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md`。",
+    },
     "glossary.tab_intro": {"vi": "Giới thiệu", "ja": "はじめに"},
     "intro.quick_answer_title": {
         "vi": "Công cụ này có dùng được cho nghiên cứu hồi cứu không?",
@@ -205,77 +220,92 @@ _STRINGS: dict[str, dict[str, str]] = {
               "タブをご覧ください。",
     },
     "glossary.overview_header": {
-        "vi": "Tổng quan: D1 → D4 được tạo ra và dùng như thế nào",
-        "ja": "概要：D1〜D4はどのように作られ、どう使われるか",
+        "vi": "Tổng quan: D4 → Group tháng → D1 → Review (mô hình v1.3.1, 1 trục)",
+        "ja": "概要：D4→月単位グルーピング→D1→レビュー（v1.3.1モデル、単一軸）",
     },
     "glossary.overview_flow_d1": {
-        "vi": "Phân loại từng dòng bệnh danh",
-        "ja": "傷病名の各行を分類",
+        "vi": "Lọc bản ghi tính tiền kháng sinh tiêm/truyền (静注・点滴静注)",
+        "ja": "注射用抗菌薬の静注・点滴静注の算定記録を抽出",
     },
     "glossary.overview_flow_d2": {
-        "vi": "Nhận diện từng dòng kháng sinh tiêm",
-        "ja": "注射用抗菌薬の各行を識別",
+        "vi": "Gộp theo (clinic_id, patient_id) + tháng liên tục → 1 candidate",
+        "ja": "(clinic_id, patient_id) ＋ 連続月でグループ化 → 候補1件",
     },
     "glossary.overview_flow_q30": {
-        "vi": "Gộp theo bệnh nhân (A ∩ B)",
-        "ja": "患者単位で結合（A ∩ B）",
+        "vi": "Gắn病名 làm metadata (A14–A16) — không dùng để chọn candidate",
+        "ja": "病名をメタデータとして付加（A14〜A16）— 候補選定には使わない",
     },
     "glossary.overview_flow_d3": {
-        "vi": "Tra ma trận → mã A/B/C/X",
-        "ja": "マトリクス参照 → A/B/C/Xコード",
+        "vi": "Con người xác định episode/Day0/case_status/転帰",
+        "ja": "人がエピソード／Day0／case_status／転帰を判定",
     },
     "glossary.overview_flow_d4_note": {
-        "vi": "D4 không nằm trong luồng phân loại chính — chạy song song, bổ sung bằng chứng thủ thuật/truyền dịch cho từng ứng viên (xem bên dưới).",
-        "ja": "D4は上記の分類フローには含まれません — 並行して動作し、各候補に手技・輸液の補助的根拠を追加します（下記参照）。",
+        "vi": "V1-ROUTE (`D4_注射区分`, mã `.310`–`.350`) là điều kiện LỌC duy nhất chọn candidate — không còn "
+              "kết hợp AND giữa nhiều trục (病名×薬剤×点滴手技) như model v1.0.",
+        "ja": "V1-ROUTE（`D4_注射区分`、コード`.310`〜`.350`）が候補を選ぶ唯一のフィルタ条件です — v1.0モデルの"
+              "ような複数軸（病名×薬剤×点滴手技）のAND結合はもうありません。",
     },
     "glossary.overview_d1": {
-        "vi": "**D1 — Phân loại bệnh danh** (chạy trên từng dòng `disease_records`): chuẩn hóa tên bệnh (NFKC) → "
-              "áp 8 từ bổ nghĩa (regex M01–M08) để xác định trạng thái X/H/S/A → so khớp với 18 phân loại theo "
-              "đúng thứ tự ưu tiên (`order` 1→18), dừng ở phân loại đầu tiên khớp. Chỉ dòng ở trạng thái A hoặc S "
-              "mới đi tiếp vào D3; H (tiền sử/đã điều trị) và X (phòng ngừa) bị loại khỏi căn cứ phân tích chính.",
-        "ja": "**D1 — 傷病名の分類**（`disease_records` の各行に適用）：傷病名をNFKC正規化 → 8種の接尾語正規表現"
-              "（M01〜M08）で状態X/H/S/Aを判定 → 18分類を優先順位（`order` 1→18）の順に照合し、最初に一致した分類で"
-              "確定。A・S状態の行のみD3へ進み、H（既往・治療後）とX（予防）は主解析の根拠から除外されます。",
+        "vi": "**Bước 1 — D4_注射区分 (lọc candidate)**: quét `medical_records`, giữ lại dòng có mã tính tiền "
+              "khớp `D4_注射区分` (`.310`–`.350`, tương ứng 皮下筋肉注射/静脈注射/点滴注射) VÀ là kháng sinh tiêm "
+              "(theo D2_成分/D2_検索語, nội dung giữ nguyên từ v1.0). Cột `候補にするか` cho biết medical_class "
+              "nào được tính; cột `A13投与経路` ghi lại 静注/点滴静注.",
+        "ja": "**ステップ1 — D4_注射区分（候補フィルタ）**：`medical_records` を走査し、`D4_注射区分`（`.310`〜"
+              "`.350`、皮下筋肉注射／静脈注射／点滴注射に対応）に一致する算定コード **かつ** 注射用抗菌薬（D2_成"
+              "分／D2_検索語、内容はv1.0から変更なし）の行のみ残す。`候補にするか`列がどのmedical_classを候補と"
+              "して数えるかを示し、`A13投与経路`列が静注／点滴静注を記録する。",
     },
     "glossary.overview_d2": {
-        "vi": "**D2 — Nhận diện kháng sinh tiêm** (chạy trên từng dòng `medical_records`): so khớp chuỗi "
-              "`search_term` (đã NFKC-normalize) với tên thuốc/mã giá thuốc; mỗi thành phần khớp được gắn vào 1 "
-              "trong 7 nhóm dược lý G1–G6, dùng ở bước D3.",
-        "ja": "**D2 — 注射用抗菌薬の識別**（`medical_records` の各行に適用）：NFKC正規化済みの `search_term` を"
-              "薬剤名・薬価コードと照合。一致した各成分はD3で使う7つの薬理グループ（G1〜G6）のいずれかに割り当て"
-              "られます。",
+        "vi": "**Bước 2 — Group theo tháng liên tục**: vì ORCA chỉ có `perform_month` (không có ngày tính tiền), "
+              "1 candidate = 1 chuỗi tháng liên tục có tính tiền kháng sinh tiêm/truyền, theo từng `(clinic_id, "
+              "patient_id)`. `candidate_id` = `施設ID:患者番号:最初の算定月` (vd `clinic_001:00000004:2025-11`) "
+              "— cùng điều kiện tìm sẽ luôn ra cùng ID.",
+        "ja": "**ステップ2 — 連続月のグルーピング**：ORCAには`perform_month`（月単位）しかなく算定日が無いため、"
+              "候補1件＝`(clinic_id, patient_id)` ごとに注射用抗菌薬の算定がある連続した月の並び。`candidate_id`"
+              "＝「施設ID:患者番号:最初の算定月」（例：clinic_001:00000004:2025-11）— 同じ検索条件なら常に同じ"
+              "IDになる。",
     },
     "glossary.overview_merge": {
-        "vi": "**Gộp theo bệnh nhân**: các dòng D1 (Set A/Q10) và D2 (Set B/Q20) được hợp theo `(clinic_id, "
-              "patient_id)` — vì `disease_records` và `medical_records` không chia sẻ khóa cấp bản ghi, điều kiện "
-              "AND giữa A và B chỉ có thể thực hiện ở cấp bệnh nhân, không phải cấp bản ghi.",
-        "ja": "**患者単位での結合**：D1（Set A/Q10）とD2（Set B/Q20）の行を `(clinic_id, patient_id)` で結合しま"
-              "す。`disease_records` と `medical_records` はレコード単位のキーを共有しないため、AとBのAND条件は"
-              "レコード単位ではなく患者単位でのみ成立します。",
+        "vi": "**Bước 3 — D1 gắn病名 làm metadata**: với mỗi candidate, đọc `disease_records` hiệu lực trong "
+              "khoảng thời gian đó, chuẩn hóa NFKC + áp 8 từ bổ nghĩa (M01–M08, ý nghĩa X/H/S/A giữ nguyên từ "
+              "v1.0) rồi so khớp 18 phân loại — nhưng kết quả chỉ ghi vào cột `diagnosis_categories` (A16) để "
+              "reviewer tham khảo, **không** còn dùng để chọn hay loại candidate như Set A/Q10 cũ.",
+        "ja": "**ステップ3 — D1による病名メタデータの付加**：各候補について、該当期間に有効な `disease_records` "
+              "をNFKC正規化＋8種の修飾語（M01〜M08、X/H/S/Aの意味はv1.0と同じ）で判定し18分類に照合 — ただし結果"
+              "は `diagnosis_categories`（A16）列にレビュー参考として記録するのみで、旧 集合A／Q10のように候補"
+              "の選定・除外には**使わない**。",
     },
     "glossary.overview_d3": {
-        "vi": "**D3 — Ma trận phán định** (chỉ chạy cho bệnh nhân thuộc Q30 = vừa có D1 vừa có D2): tra ma trận "
-              "8 hàng (nhóm bệnh danh D1) × 7 cột (nhóm kháng sinh D2 G1–G6) → mã A/B/C/X. Đây là **tín hiệu ưu "
-              "tiên rà soát**, không phải kết luận lâm sàng — luôn cần xác nhận qua đọc bệnh án thủ công.",
-        "ja": "**D3 — 判定マトリクス**（Q30＝D1とD2の両方に該当する患者のみ対象）：8行（D1傷病名分類）×7列（D2抗"
-              "菌薬グループ G1〜G6）のマトリクスを参照し、A/B/C/Xのコードを決定します。これは**レビュー優先度の"
-              "目安**であり、臨床的な結論ではありません — 必ず診療録の手動確認が必要です。",
+        "vi": "**Bước 4 — Con người xác định episode/Day0/case_status**: reviewer đọc 電子カルテ (NAHT/HOMIS) "
+              "thật, áp \"quy tắc 14 ngày\" (khoảng cách 2 lần truyền ≥15 ngày = episode mới) theo ngày thật để "
+              "tách 1 candidate thành nhiều `episode_id` (`candidate_id-1`, `candidate_id-2`...), rồi gán "
+              "`case_status` = 対象/対象外/保留 (B02) + lý do B03. Tool **không được** tự quyết diagnosis, Day0, "
+              "14-day rule hay case_status (`検索ツール設計の考え方` §2–4).",
+        "ja": "**ステップ4 — 人によるエピソード／Day0／case_status判定**：レビュー担当者が実際の電子カルテ"
+              "（NAHT／HOMIS）を読み、「14日ルール」（2回の投与の間隔が15日以上＝新しいエピソード）を実際の日付"
+              "で適用して候補を複数の`episode_id`（`candidate_id-1`、`candidate_id-2`…）に分割し、`case_status`"
+              "＝対象／対象外／保留（B02）＋理由B03を判定する。ツールは診断・Day0・14日ルール・case_statusを**"
+              "自動で決定してはならない**（検索ツール設計の考え方§2〜4）。",
     },
     "glossary.overview_d4": {
-        "vi": "**D4 — Bằng chứng thủ thuật/truyền dịch bổ sung**: đọc thêm `medical_points` và các mã tính phí "
-              "tiêm/truyền để làm manh mối hỗ trợ cho ứng viên — KHÔNG dùng để tự động xác nhận đã thực sự dùng "
-              "thuốc (CLAUDE.md mục 3).",
-        "ja": "**D4 — 手技・輸液の補助的根拠**：`medical_points` および注射・輸液関連の算定コードを追加で参照し、"
-              "候補を裏付ける手がかりとします。実際に投与されたことを自動的に確認するものではありません"
-              "（CLAUDE.md 第3項）。",
+        "vi": "**Bước 5 — 転帰 30 ngày (sau khi reviewer xác nhận Day0)**: cửa sổ Day0–Day30 (cả 2 đầu); "
+              "複合転帰 = bất kỳ 1/3 (nhập viện/cấp cứu/tử vong) = \"あり\"; \"なし\" chỉ ghi khi xác nhận dương "
+              "không có event — im lặng/thiếu ghi chép luôn ra \"不明\", không mặc định \"なし\". **保留 không "
+              "vào mẫu số chính** — báo riêng (`held_back_count`), theo quyết định tạm thời 2026-11-11 (xem tab "
+              "Nghi vấn & Xác nhận, mục D).",
+        "ja": "**ステップ5 — 30日転帰（レビュー担当者がDay0を確定した後）**：Day0〜Day30（両端含む）の観察期間。"
+              "複合転帰＝入院・救急搬送・死亡のいずれか1つでも「あり」。「なし」は陰性を確認できた場合のみ記録し"
+              "、記録がない／不明な場合は常に「不明」（デフォルトで「なし」にはしない）。**保留は主分母に含めな"
+              "い** — `held_back_count`として別掲（2026-11-11の暫定決定、詳細は「未確認・確認済み事項」タブD"
+              "項）。",
     },
     "glossary.overview_source": {
-        "vi": "Tóm tắt theo deliverables/session03/vn_review/dictionary_specification_vn.md (bản dịch Session 03 "
-              "từ Master Document v1.0) — tài liệu này tự ghi là DRAFT, chưa được nhóm nghiên cứu phê duyệt. "
-              "Nguồn thẩm quyền cao nhất vẫn là Master Document; đây chỉ là tóm tắt điều hướng, không thay thế nó.",
-        "ja": "deliverables/session03/vn_review/dictionary_specification_vn.md（マスタードキュメント v1.0 から"
-              "のSession 03翻訳版）の要約です — この文書自体がDRAFT（研究チーム未承認）と明記されています。最上位"
-              "の権威源は引き続きマスタードキュメントであり、これはナビゲーション用の要約に過ぎません。",
+        "vi": "Tóm tắt theo `deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md` Mục 2.1–2.6 "
+              "+ `後ろ向き集計 手順書v1.3.1` §3/§5/§6 + `CSV設計説明書v1.3.1` §4/§6 — nguồn thẩm quyền cao nhất "
+              "vẫn là `手順書v1.3.1` (正本, CLAUDE.md mục 2); đây chỉ là tóm tắt điều hướng, không thay thế nó.",
+        "ja": "`deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md` Mục2.1〜2.6 ＋『後ろ向き"
+              "集計 手順書v1.3.1』§3／§5／§6 ＋『CSV設計説明書v1.3.1』§4／§6 の要約。最上位の権威源は引き続き"
+              "`手順書v1.3.1`（正本、CLAUDE.md §2）であり、これはナビゲーション用の要約に過ぎません。",
     },
     "glossary.tab_open_questions": {"vi": "Nghi vấn & Xác nhận", "ja": "未確認・確認済み事項"},
     "glossary.tab_howitworks": {"vi": "Cách hoạt động (dễ hiểu)", "ja": "仕組み（やさしい説明）"},
@@ -295,12 +325,18 @@ _STRINGS: dict[str, dict[str, str]] = {
     "glossary.oq_status_resolved": {"vi": "✅ Đã xác nhận", "ja": "✅ 確認済み"},
     "glossary.oq_status_proposed": {"vi": "🟡 Đề xuất, chưa phê duyệt", "ja": "🟡 提案中（未承認）"},
     "glossary.oq_source": {
-        "vi": "Nguồn: deliverables/session00/08_unresolved_decisions_register.md (Session 00, 2026-11-04) — chỉ "
-              "lấy phần A/B/C (quyết định nghiên cứu/lâm sàng, logic D1–D4/Q/QC, mô hình CSV); phần D (phát hiện "
-              "kỹ thuật/code, INT-00-xx) và E (housekeeping) thuộc backlog kỹ thuật, xem trực tiếp file gốc.",
-        "ja": "出典：deliverables/session00/08_unresolved_decisions_register.md（Session 00、2026-11-04）— A/B/C"
-              "（研究・臨床上の決定、D1〜D4/Q/QCのロジック、CSVデータモデル）のみを掲載。D項（実装・コードレベルの"
-              "指摘、INT-00-xx）とE項（housekeeping）は技術バックログのため原典を直接参照してください。",
+        "vi": "Nguồn mục A/B/C: deliverables/session00/08_unresolved_decisions_register.md (Session 00, "
+              "2026-11-04) — chỉ lấy phần A/B/C (quyết định nghiên cứu/lâm sàng, logic D1–D4/Q/QC, mô hình CSV) "
+              "**của model v1.0**; phần D (phát hiện kỹ thuật/code, INT-00-xx) và E (housekeeping) thuộc backlog "
+              "kỹ thuật, xem trực tiếp file gốc. Nguồn mục D: "
+              "deliverables/session00/15_addendum_v1.3.1_migration_plan_2026-11-11.md (Mục 0 + Mục 5) — trạng "
+              "thái migrate sang model v1.3.1, đã giải quyết/còn tồn đọng, cập nhật 2026-11-11/12.",
+        "ja": "A/B/C項の出典：deliverables/session00/08_unresolved_decisions_register.md（Session 00、"
+              "2026-11-04）— **v1.0モデル**のA/B/C（研究・臨床上の決定、D1〜D4/Q/QCのロジック、CSVデータモデル）"
+              "のみを掲載。D項（実装・コードレベルの指摘、INT-00-xx）とE項（housekeeping）は技術バックログのため"
+              "原典を直接参照してください。D項の出典：deliverables/session00/15_addendum_v1.3.1_migration_"
+              "plan_2026-11-11.md（Mục0＋Mục5）— v1.3.1モデルへの移行状況（解決済み／未解決）、2026-11-11/12更"
+              "新。",
     },
     "glossary.tab_d1": {"vi": "D1 — Bệnh danh", "ja": "D1 — 傷病名"},
     "glossary.tab_d2": {"vi": "D2 — Kháng sinh tiêm", "ja": "D2 — 注射用抗菌薬"},
@@ -354,6 +390,19 @@ _STRINGS: dict[str, dict[str, str]] = {
               "（A/B/C/X）です。レビュー優先度の目安であり、臨床的な結論ではありません。",
     },
     "glossary.d4_header": {"vi": "Mã thủ thuật tiêm/truyền (P01–P11…)", "ja": "注射・輸液の手技コード（P01〜P11…）"},
+    "glossary.d4_v131_info": {
+        "vi": "v1.3.1: D4 không còn là \"loại thủ thuật tham khảo\" (P01-P24 cũ) mà là nguồn chọn candidate "
+              "trực tiếp (V1-ROUTE). 2 cột mới `候補にするか` / `A13投与経路` cho biết medical_class nào được "
+              "tính là candidate.",
+        "ja": "v1.3.1：D4はもはや「参考の手技種別」（旧P01-P24）ではなく、候補を直接選ぶための情報源"
+              "（V1-ROUTE）です。新しい2列`候補にするか`／`A13投与経路`が、どのmedical_classが候補として"
+              "カウントされるかを示します。",
+    },
+    "glossary.d5_version_caption": {"vi": "D5 version: {version}", "ja": "D5バージョン：{version}"},
+    "glossary.d5_not_found_caption": {
+        "vi": "dictionaries/D5_context_flags.csv chưa có trong lần chạy này.",
+        "ja": "この実行には dictionaries/D5_context_flags.csv がありません。",
+    },
     "glossary.d4_caption": {
         "vi": "Phân loại dựa trên mã thanh toán (billing_classification) — chỉ là manh mối về đường dùng thuốc, "
               "KHÔNG phải bằng chứng xác nhận đã thực sự dùng thuốc (CLAUDE.md mục 3).",
@@ -380,45 +429,74 @@ _STRINGS: dict[str, dict[str, str]] = {
         "ja": "このタブは専門用語を使わずツールの仕組みを説明します。D1/D2/D4 の実データ表は"
               "隣の3つのタブにあります。",
     },
-    "how.sets_header": {"vi": "Ba \"tập hợp\" A/B/C quyết định ai là ứng viên", "ja": "候補を決める3つの「集合」A/B/C"},
+    "how.sets_header": {
+        "vi": "Chỉ 1 điều kiện chọn candidate — không còn ghép 3 \"tập hợp\" như trước",
+        "ja": "候補を選ぶ条件は1つだけ — 以前のような3つの「集合」の組み合わせではない",
+    },
     "how.sets_intro": {
-        "vi": "Tool nhìn mỗi bệnh nhân qua 3 câu hỏi độc lập, giống 3 vòng tròn chồng lên nhau:",
-        "ja": "ツールは各患者を3つの独立した質問で見ます。3つの輪が重なるイメージです。",
+        "vi": "v1.0 nhìn mỗi bệnh nhân qua 3 câu hỏi độc lập (3 vòng tròn chồng lên nhau); v1.3.1 đơn giản hoá "
+              "hẳn, chỉ còn 1 điều kiện:",
+        "ja": "v1.0は各患者を3つの独立した質問（重なる3つの輪）で見ていましたが、v1.3.1は条件を1つだけに簡素"
+              "化しました：",
     },
-    "how.set_a": {"vi": "**Tập A** — có ghi nhận *tên bệnh* phù hợp (theo D1) không?", "ja": "**集合A** — D1に合う*傷病名*の記録があるか？"},
-    "how.set_b": {"vi": "**Tập B** — có ghi nhận *dùng kháng sinh tiêm* phù hợp (theo D2) không?", "ja": "**集合B** — D2に合う*注射用抗菌薬*の記録があるか？"},
-    "how.set_c": {"vi": "**Tập C** — có ghi nhận *thủ thuật tiêm/truyền dịch* nói chung (theo D4) không?", "ja": "**集合C** — D4に合う*注射・点滴の手技*全般の記録があるか？"},
+    "how.compare_old": {
+        "vi": "3 trục độc lập: 病名 (D1/Tập A) × 注射薬 (D2/Tập B) × 点滴手技 (D4 cũ/Tập C), kết hợp qua "
+              "Q10/Q20/Q30 thành ma trận 7 vùng (chỉ A, chỉ B, chỉ C, A+B, A+C, B+C, A+B+C). Tool tự judge D3 "
+              "→ gán mã A/B/C/X cho từng candidate.",
+        "ja": "3つの独立した軸：病名（D1／集合A）×注射薬（D2／集合B）×点滴手技（旧D4／集合C）をQ10／Q20／"
+              "Q30で組み合わせ、7領域のマトリクス（Aのみ、Bのみ、Cのみ、A+B、A+C、B+C、A+B+C）を作る。ツール"
+              "がD3で自動判定しA/B/C/Xのコードを付与。",
+    },
+    "how.compare_new": {
+        "vi": "1 điều kiện duy nhất: có bản ghi tính tiền kháng sinh tiêm/truyền, lọc qua `D4_注射区分` (mã "
+              "`.310`–`.350`). 病名 (D1) chỉ còn là metadata gắn kèm — **không** dùng để chọn hay loại "
+              "candidate. Con người (reviewer) xác định episode/Day0/case_status/転帰, không phải tool.",
+        "ja": "条件は1つだけ：`D4_注射区分`（コード`.310`〜`.350`）でフィルタした注射用抗菌薬の算定記録がある"
+              "こと。病名（D1）は付加メタデータに過ぎず、候補の選定・除外には**使わない**。エピソード／Day0／"
+              "case_status／転帰は人（レビュー担当者）が判断し、ツールは判断しない。",
+    },
     "how.sets_note": {
-        "vi": "3 vòng tròn chồng lên nhau tạo ra **7 vùng khác nhau**. Vùng **A+B** (có cả bệnh phù hợp "
-              "VÀ thuốc phù hợp) là ứng viên ưu tiên cao nhất. Các vùng khác (chỉ A, chỉ B, chỉ C, A+C, B+C...) "
-              "vẫn được giữ lại để rà soát, vì hồ sơ có thể ghi thiếu — không hẳn là không phù hợp.",
-        "ja": "3つの輪が重なって**7つの領域**ができます。**A+B**（傷病名も薬剤も一致）が最も優先度の"
-              "高い候補です。他の領域（Aのみ、Bのみ、A+C等）も、記録漏れの可能性があるため"
-              "レビュー対象として保持されます。",
+        "vi": "A_only/C_only/A+C (chỉ病名 hoặc chỉ thủ thuật, không có thuốc tiêm) **không bao giờ** là candidate "
+              "ở v1.3.1 — khác hẳn v1.0 (nơi các vùng này vẫn được giữ lại để rà soát).",
+        "ja": "A_only／C_only／A+C（病名のみ、または手技のみで薬剤なし）は v1.3.1 では**候補になりません** — "
+              "これらの領域もレビュー対象として保持していたv1.0とは異なります。",
     },
-    "how.certainty_header": {"vi": "Mức độ chắc chắn của tên bệnh (A / S / H / X)", "ja": "傷病名の確からしさ（A・S・H・X）"},
+    "how.certainty_header": {
+        "vi": "Mức độ chắc chắn của病名 gắn kèm (A / S / H / X) — vẫn dùng để gắn metadata, không dùng để chọn candidate",
+        "ja": "付加される病名の確からしさ（A・S・H・X）— メタデータ付加に使うが、候補選定には使わない",
+    },
     "how.certainty_intro": {
         "vi": "Không phải cứ thấy tên bệnh là chắc chắn 100%. \"Viêm phổi\" (đang mắc) khác hẳn \"tiền sử "
               "viêm phổi\" hay \"phòng viêm phổi\". Mỗi dòng bệnh được phân vào 1 trong 4 mức sau, dựa trên "
-              "các từ đứng sau tên bệnh (D1 — 8 \"từ bổ nghĩa\"):",
+              "các từ đứng sau tên bệnh (D1 — 8 \"từ bổ nghĩa\", ý nghĩa giữ nguyên từ v1.0). Lưu ý: ở v1.3.1, "
+              "D1 không còn quyết định ai là candidate — 4 mức dưới đây chỉ ảnh hưởng tới nội dung cột "
+              "`diagnosis_categories` (A16) gắn kèm mỗi candidate, để reviewer tham khảo:",
         "ja": "傷病名があるだけで100%確実とは限りません。「肺炎」（現在罹患）と「肺炎の既往」「肺炎予防」は"
-              "全く別です。各行は病名の後に付く語（D1の8個の修飾語）によって次の4段階に分類されます：",
+              "全く別です。各行は病名の後に付く語（D1の8個の修飾語、意味はv1.0のまま）によって次の4段階に分類"
+              "されます。注意：v1.3.1ではD1はもはや候補の選定を決めません — 以下の4段階は各候補に付加される "
+              "`diagnosis_categories`（A16）列の内容にのみ影響し、レビュー参考情報として使われます：",
     },
     "how.certainty_a": {"vi": "✓ **A — Đang hoạt động**: dùng làm căn cứ, giữ nguyên độ tin cậy (gồm cả \"tái phát/bùng phát\").", "ja": "✓ **A — 活動性**：根拠として使用、信頼度は下げない（「再燃・増悪」含む）。"},
-    "how.certainty_s": {"vi": "✓ **S — Nghi ngờ**: dùng, nhưng tool tự hạ 1 bậc độ tin cậy ở bước D3.", "ja": "✓ **S — 疑い**：使用するが、D3の段階で信頼度を1段階下げる。"},
+    "how.certainty_s": {"vi": "✓ **S — Nghi ngờ**: dùng, nhưng gắn vào metadata ở mức thấp hơn A.", "ja": "✓ **S — 疑い**：使用するが、メタデータ上はAより低い段階として記録する。"},
     "how.certainty_h": {"vi": "✕ **H — Tiền sử**: KHÔNG dùng — không phải đợt bệnh lần này (đã qua/sau điều trị/di chứng).", "ja": "✕ **H — 既往**：使用しない — 今回のエピソードではない（既往・治療後・後遺症）。"},
     "how.certainty_x": {"vi": "✕ **X — Dự phòng**: KHÔNG dùng — chưa mắc bệnh, chỉ là phòng ngừa.", "ja": "✕ **X — 予防**：使用しない — まだ罹患していない、予防のみ。"},
-    "how.undecided_header": {"vi": "Vì sao có rất nhiều mục \"chưa xác định\"?", "ja": "「未確認・未決定」が多いのはなぜ？"},
+    "how.undecided_header": {
+        "vi": "Vì sao vẫn còn nhiều mục \"cần quyết định\" sau khi migrate xong?",
+        "ja": "移行完了後も「要決定」項目が多いのはなぜ？",
+    },
     "how.undecided_body": {
-        "vi": "Đây **không phải lỗi của tool** — đây là cách làm bắt buộc của nghiên cứu y khoa: khi chưa "
-              "có đủ bằng chứng chắc chắn, tool **không đoán bừa**, mà giữ nguyên trạng thái \"chưa rõ\" và "
-              "giao lại cho con người quyết định (CLAUDE.md mục 3). Ví dụ: mã thủ thuật C005-2 (truyền dịch "
-              "tại nhà) chỉ xác nhận có tính phí, không xác nhận đã truyền thật — nên luôn hiển thị là manh "
-              "mối, không phải bằng chứng.",
-        "ja": "これは**ツールの欠陥ではありません** — 十分な根拠がない場合に推測で埋めず「未確認」の"
-              "ままにして人の判断に委ねるのが、医学研究で求められる慎重な扱い方です（CLAUDE.md 第3項）。"
-              "例：手技コードC005-2（在宅点滴）は算定されたことのみを示し、実際に投与されたことは"
-              "確定しません — 常に手がかりとして扱われ、確定根拠にはなりません。",
+        "vi": "Việc viết lại code (model 1 trục, group theo tháng, 6 trang app, test) đã **xong** 2026-11-11 — "
+              "nhưng đó chỉ là phần kỹ thuật. Các câu hỏi **nghiệp vụ/lâm sàng** (công thức急変率chính thức, "
+              "danh sách lý do 保留/対象外 cuối cùng, quyền dữ liệu cá nhân, quy trình xác nhận nhập viện ngoài "
+              "cơ sở...) vẫn cần chủ dự án/bác sĩ quyết định. Đây **không phải lỗi của tool** — CLAUDE.md mục 3 "
+              "yêu cầu tool không tự chốt thay con người khi chưa có đủ bằng chứng/phê duyệt. Xem danh sách đầy "
+              "đủ, có đánh dấu rõ đã giải quyết/còn mở, ở mục **D** trong tab \"Nghi vấn & Xác nhận\".",
+        "ja": "コードの書き直し（単一軸モデル、月単位グルーピング、appの6ページ、テスト）は2026-11-11に**完了**"
+              "しましたが、これは技術面だけです。**業務・臨床面**の論点（急変率の正式な計算式、保留／対象外の"
+              "最終的な理由リスト、個人データの利用権限、施設外入院の確認プロセスなど）は、依然としてチーム"
+              "責任者・医師の決定が必要です。これは**ツールの欠陥ではありません** — CLAUDE.md第3項は、十分な"
+              "根拠・承認がない場合にツールが人に代わって決定しないことを求めています。解決済み／未解決を明示"
+              "した全リストは「未確認・確認済み事項」タブのD項にあります。",
     },
     "how.d5_header": {"vi": "D5 — cờ cảnh báo bổ sung (DRAFT, chưa phê duyệt chính thức)", "ja": "D5 — 追加コンテキストフラグ（DRAFT・未承認）"},
     "how.d5_body": {
@@ -441,30 +519,45 @@ _STRINGS: dict[str, dict[str, str]] = {
               "14日とする目安を含む）。これは**レビュー担当者向けの例示**であり、ツールの自動判定ルール"
               "ではありません。",
     },
-    "how.refs_header": {"vi": "Nguồn tài liệu tham khảo đã dùng để xây tool", "ja": "ツール構築に使用した参照資料"},
+    "how.refs_header": {"vi": "Nguồn tài liệu tham khảo đã dùng để xây tool (v1.3.1)", "ja": "ツール構築に使用した参照資料（v1.3.1）"},
     "how.ref_master": {
-        "vi": "**Tài liệu gốc (Master Document)** — thẩm quyền cao nhất, định nghĩa toàn bộ quy tắc nghiên cứu, từ điển bệnh/thuốc và điều kiện tìm kiếm chính thức.",
-        "ja": "**マスタードキュメント** — 最上位の権威資料。研究の全ルール、病名・薬剤辞書、正式な検索条件を定義。",
+        "vi": "**後ろ向き集計 手順書v1.3.1.docx (正本)** — nguồn thẩm quyền cao nhất hiện tại (CLAUDE.md mục 2); "
+              "định nghĩa mô hình candidate, Day0/14-day rule, case_status/転帰. Khi tài liệu khác mâu thuẫn, "
+              "tài liệu này thắng. (Master Document v1.0 cũ hạ xuống chỉ tham khảo lịch sử.)",
+        "ja": "**後ろ向き集計 手順書v1.3.1.docx（正本）** — 現在の最上位の権威資料（CLAUDE.md §2）。候補モデル、"
+              "Day0／14日ルール、case_status／転帰を定義。他文書と矛盾する場合はこれが優先（旧v1.0マスタードキ"
+              "ュメントは歴史的参考のみに格下げ）。",
     },
     "how.ref_policy": {
-        "vi": "**Chính sách thực hiện Phase 0** — hướng dẫn quy trình làm việc tổng thể của giai đoạn nghiên cứu.",
-        "ja": "**Phase 0実施方針** — 本研究フェーズの全体的な作業手順のガイド。",
+        "vi": "**後ろ向き集計 実施方針の概要v1.3.1.docx** — tổng quan mục đích/phạm vi, liệt kê 5 tài liệu chính "
+              "thức (tài liệu thứ 5 \"急変率の計算\" chưa tồn tại trong document/A/v1.3.1/).",
+        "ja": "**後ろ向き集計 実施方針の概要v1.3.1.docx** — 目的・範囲の概要、5つの公式文書を列挙（5番目「急変率"
+              "の計算」はdocument/A/v1.3.1/にまだ存在しない）。",
     },
     "how.ref_pharma": {
-        "vi": "**Tài liệu y dược cơ bản** — nền tảng y khoa về bệnh hô hấp/kháng sinh tại nhà, hỗ trợ xây D1/D2.",
-        "ja": "**医学薬学的基礎資料** — 在宅での呼吸器感染症・抗菌薬に関する医学的基盤。D1/D2構築の土台。",
+        "vi": "**後ろ向き集計 CSV設計説明書v1.3.1.docx + 診療録レビューの判定基準v1.3.1.docx** — quy định 41 "
+              "cột CSV (A/B/C) và tiêu chí Day0/case_status/転帰 cho reviewer.",
+        "ja": "**後ろ向き集計 CSV設計説明書v1.3.1.docx＋診療録レビューの判定基準v1.3.1.docx** — CSV41列"
+              "（A/B/C）の仕様と、レビュー担当者向けDay0／case_status／転帰の判定基準。",
     },
     "how.ref_csvguide": {
-        "vi": "**Hướng dẫn thiết kế file xuất CSV v1.0** — quy định cột dữ liệu của file xuất bổ sung (39 cột), nguồn của D5.",
-        "ja": "**CSV出力設計ガイド v1.0** — 追加出力ファイル（39列）の列仕様。D5の出典。",
+        "vi": "**後ろ向き集計 検索ツールの設計基準と辞書v1.3.1.docx + 検索ツール辞書v1.3.1.xlsx** — nguồn "
+              "D1/D2/D3/D4/D5, bao gồm sheet mới D4_注射区分.",
+        "ja": "**後ろ向き集計 検索ツールの設計基準と辞書v1.3.1.docx＋検索ツール辞書v1.3.1.xlsx** — D1/D2/D3/"
+              "D4/D5の出典。新シートD4_注射区分を含む。",
     },
     "how.ref_patterns": {
-        "vi": "**Tài liệu 15 tình huống mẫu rà soát** — ví dụ tổ hợp bệnh×thuốc điển hình cho người rà soát.",
-        "ja": "**レビュー用15パターン資料** — レビュー担当者向けの典型的な病名×薬剤の組み合わせ例。",
+        "vi": "**在宅抗菌薬点滴エピソード特定・転帰判定ガイド(早見表)v1.3.1.docx** — hướng dẫn nhanh step-by-"
+              "step cho reviewer, thay vai trò tài liệu \"15 tình huống mẫu\" cũ (xem mục bên trên).",
+        "ja": "**在宅抗菌薬点滴エピソード特定・転帰判定ガイド（早見表）v1.3.1.docx** — レビュー担当者向けのス"
+              "テップバイステップ早見表。旧「15パターン資料」（上記参照）の役割を引き継ぐ。",
     },
     "how.ref_dbprofile": {
-        "vi": "**Hồ sơ khảo sát cơ sở dữ liệu thật (Session 02)** — kiểm tra trực tiếp trên hệ thống thật, đảm bảo tool dùng đúng tên bảng/cột đang tồn tại.",
-        "ja": "**実データベース調査報告（Session 02）** — 実システムを直接確認し、存在する正しいテーブル名・列名を使用していることを保証。",
+        "vi": "**Hồ sơ khảo sát cơ sở dữ liệu thật (Session 02) + rà soát trực tiếp orca_snapshot.db "
+              "(2026-11-11)** — kiểm tra trực tiếp trên hệ thống thật, đảm bảo tool dùng đúng tên bảng/cột đang "
+              "tồn tại.",
+        "ja": "**実データベース調査報告（Session 02）＋orca_snapshot.dbの直接確認（2026-11-11）** — 実システム"
+              "を直接確認し、存在する正しいテーブル名・列名を使用していることを保証。",
     },
     # ---- Trang "Home" (Block 1 — Database Overview) ------------------------
     "home.caption": {
@@ -573,9 +666,25 @@ _STRINGS: dict[str, dict[str, str]] = {
         "ja": "⚠ QC2（C005-2）の照合文字列は実データで未検証です（OPEN-04-01）— QC2の一致は常に"
               "UNCONFIRMEDと表示され、Yにはなりません。",
     },
+    "search.model_info": {
+        "vi": "Model v1.3.1: 1 candidate = 1 chuỗi tháng liên tục có算定注射用抗菌薬 (静注/点滴静注) cho "
+              "1 bệnh nhân. Công cụ KHÔNG tự xác định treatment episode (quy tắc 14 ngày), Day 0, case_status "
+              "hay転帰 — việc đó do reviewer làm trên file xuất ra (xem trang Xuất dữ liệu).",
+        "ja": "モデル v1.3.1：1候補＝1人の患者について、注射用抗菌薬（静注／点滴静注）が算定された月が連続して"
+              "いるひとまとまり。本ツールは治療エピソード（14日ルール）、Day 0、case_status、転帰を自動では"
+              "判定しません — それらはレビュー担当者が出力ファイル上で行います（「データ出力」ページ参照）。",
+    },
+    "search.data_limit_warning": {
+        "vi": "Giới hạn dữ liệu đã biết (không phải lỗi, xem addendum v1.3.1 Mục 2.9/§6): A06 (tuổi) và A07 "
+              "(giới tính) luôn để trống — DB không có trường nhân khẩu học nào. Bệnh danh gắn vào candidate "
+              "chỉ lọc theo ngày bắt đầu, không lọc theo ngày転帰 (DB không có cột này).",
+        "ja": "既知のデータ制約（不具合ではありません。addendum v1.3.1 第2.9項/§6参照）：A06（年齢）と"
+              "A07（性別）は常に空欄です — DBに人口統計学的フィールドが存在しないためです。候補に紐づく"
+              "病名は開始日のみで絞り込み、転帰日では絞り込みません（DBにそのカラムがないため）。",
+    },
     "search.dict_version_caption": {
-        "vi": "Dictionary version: D1={d1} · D2={d2} · D3={d3} · D4={d4}",
-        "ja": "辞書バージョン：D1={d1} · D2={d2} · D3={d3} · D4={d4}",
+        "vi": "Dictionary version: D1={d1} · D2={d2} · D3={d3} · D4={d4} · D6={d6} (DRAFT)",
+        "ja": "辞書バージョン：D1={d1} · D2={d2} · D3={d3} · D4={d4} · D6={d6}（DRAFT）",
     },
     "search.run_button": {"vi": "▶ CHẠY TÌM KIẾM", "ja": "▶ 検索実行"},
     "search.spinner": {
@@ -681,6 +790,77 @@ _STRINGS: dict[str, dict[str, str]] = {
     "stats.outcome_admission_rate": {"vi": "Tỷ lệ nhập viện (B06)", "ja": "入院割合（B06）"},
     "stats.outcome_transport_rate": {"vi": "Tỷ lệ cấp cứu (B08)", "ja": "救急搬送割合（B08）"},
     "stats.outcome_death_rate": {"vi": "Tỷ lệ tử vong (B10)", "ja": "死亡割合（B10）"},
+    # ---- Trang "Thống kê" (model v1.3.1, dùng thật bởi 2_Thong_ke.py) -------
+    "stats.overview_header": {"vi": "Tổng quan", "ja": "概要"},
+    "stats.metric_candidates": {"vi": "Số candidate", "ja": "候補数"},
+    "stats.metric_patients": {"vi": "Số bệnh nhân (施設+患者番号)", "ja": "患者数（施設＋患者番号）"},
+    "stats.metric_facilities": {"vi": "Số cơ sở", "ja": "施設数"},
+    "stats.by_group_header": {"vi": "Theo nhóm NAHT/HOMIS", "ja": "グループ別（NAHT/HOMIS）"},
+    "stats.by_route_header": {"vi": "Theo đường dùng (A13 route_class)", "ja": "投与経路別（A13 route_class）"},
+    "stats.route_caption": {
+        "vi": "皮下筋肉注射 (medical_class 31) không được tính là candidate, không xuất hiện ở đây.",
+        "ja": "皮下筋肉注射（medical_class 31）は候補としてカウントされないため、ここには表示されません。",
+    },
+    "stats.length_header": {
+        "vi": "Độ dài candidate (số tháng liên tục có算定)",
+        "ja": "候補の期間（算定が連続した月数）",
+    },
+    "stats.diagnosis_header": {
+        "vi": "Bệnh danh gắn vào candidate (A16 diagnosis_categories)",
+        "ja": "候補に紐づく病名（A16 diagnosis_categories）",
+    },
+    "stats.diagnosis_caption": {
+        "vi": "Mỗi candidate có thể có nhiều病名, mỗi病名 có 1 trạng thái: A=確定（活動性）, S=疑い, "
+              "theo D1_修飾語. 保留「呼吸器感染症の疑い」(B02) vẫn là quyết định của reviewer, không phải ở đây.",
+        "ja": "1候補に複数の病名が紐づくことがあり、各病名はD1_修飾語によりA=確定（活動性）／S=疑いのいずれかの"
+              "状態を持ちます。保留「呼吸器感染症の疑い」（B02）はあくまでレビュー担当者の判断であり、ここでの"
+              "分類ではありません。",
+    },
+    "stats.diagnosis_counts_caption": {
+        "vi": "⚪ 確定/活動性 (A): {a} lượt   ·   🟡 疑い (S): {s} lượt — luôn tách biệt, không gộp chung.",
+        "ja": "⚪ 確定/活動性（A）：{a}件　・　🟡 疑い（S）：{s}件 — 常に別々に表示し、合算しません。",
+    },
+    "stats.no_diagnosis": {"vi": "Không có病名 nào được gắn.", "ja": "病名は紐づいていません。"},
+    "stats.table_col_item": {"vi": "Hạng mục", "ja": "項目"},
+    "stats.table_col_status": {"vi": "Trạng thái", "ja": "状態"},
+    "stats.row1_status": {
+        "vi": "Luôn trống — DB không có trường nhân khẩu học",
+        "ja": "常に空欄 — DBに人口統計学的フィールドが存在しない",
+    },
+    "stats.row2_status": {
+        "vi": "DB không có cột này — chỉ lọc theo ngày bắt đầu",
+        "ja": "DBにこのカラムは存在しない — 開始日のみで絞り込み",
+    },
+    "stats.row3_status": {
+        "vi": "Chưa xác minh đầy đủ với medical_class thật — xem addendum Mục 5 #6",
+        "ja": "実際のmedical_classでの検証がまだ不十分 — addendum 第5項#6参照",
+    },
+    "stats.row4_status": {
+        "vi": "Chưa có ý nghĩa chính thức, chỉ đánh dấu",
+        "ja": "正式な意味はまだなく、フラグのみ",
+    },
+    "stats.outcome_decision_caption": {
+        "vi": "Quyết định tạm thời 2026-11-11: 保留 KHÔNG vào mẫu số chính, chỉ báo riêng. Nhập viện tính cả "
+              "2 cách (toàn bộ / chỉ ngoài kế hoạch) vì công thức急変率 chính thức chưa chốt (addendum Mục 5 #1).",
+        "ja": "2026-11-11暫定決定：保留は主分母に含めず、別掲のみとします。急変率の正式な計算式がまだ確定して"
+              "いないため（addendum 第5項#1）、入院は2通り（入院すべて／予定外のみ）の両方で集計します。",
+    },
+    "stats.metric_denominator": {"vi": "Mẫu số chính (対象, qua QC)", "ja": "主分母（対象、QC通過）"},
+    "stats.metric_held_back": {"vi": "保留 (báo riêng)", "ja": "保留（別掲）"},
+    "stats.metric_not_qc": {"vi": "対象 nhưng chưa qua QC", "ja": "対象だがQC未通過"},
+    "stats.tab_all_admissions": {"vi": "Định nghĩa 1: toàn bộ nhập viện", "ja": "定義1：入院すべて"},
+    "stats.tab_unplanned": {"vi": "Định nghĩa 2: chỉ ngoài kế hoạch", "ja": "定義2：予定外のみ"},
+    "stats.ratio_formula_caption": {
+        "vi": "Mọi tỉ lệ đều tính bằng あり ÷ (あり + なし). Số dòng/tỉ lệ 確認不能 không được tính vào tử số "
+              "(CSV設計説明書v1.3.1 §8).",
+        "ja": "割合はいずれもあり÷（あり＋なし）。確認不能の件数・割合は分子に含めない（CSV設計説明書v1.3.1 "
+              "§8）。",
+    },
+    "stats.no_review_uploaded": {
+        "vi": "Chưa có file review đã điền B/C được upload (trang Danh sách ứng viên / Xuất dữ liệu).",
+        "ja": "記入済みB/Cのレビューファイルがまだアップロードされていません"
+              "（「候補一覧」／「データ出力」ページ参照）。",
+    },
     # ---- Trang "Danh sách ứng viên" (Block 5) -------------------------------
     "candidates.title": {"vi": "Danh sách ứng viên (Block 5)", "ja": "候補一覧（Block 5）"},
     "candidates.no_candidates": {"vi": "Không có ứng viên nào.", "ja": "候補がありません。"},
@@ -717,6 +897,19 @@ _STRINGS: dict[str, dict[str, str]] = {
     "candidates.detail_header": {"vi": "Xem chi tiết 1 ứng viên", "ja": "候補の詳細を見る"},
     "candidates.open_detail_button": {"vi": "➜ Mở chi tiết (Block 6)", "ja": "➜ 詳細を開く（Block 6）"},
     "candidates.link_export": {"vi": "➜ Sang trang Xuất dữ liệu (Block 7)", "ja": "➜ データ出力ページへ（Block 7）"},
+    # ---- model v1.3.1, dùng thật bởi 3_Danh_sach_ung_vien.py ----------------
+    "candidates.upload_v131_header": {
+        "vi": "Upload file review đã điền (B/C)", "ja": "記入済みレビューファイルをアップロード（B/C）",
+    },
+    "candidates.upload_v131_caption": {
+        "vi": "v1.3.1: chỉ 1 file (41 cột) — không còn 2 file Manual Review / Outcome riêng.",
+        "ja": "v1.3.1：ファイルは1つ（41列）のみ — Manual Review/Outcomeの2ファイルに分かれていません。",
+    },
+    "candidates.upload_v131_label": {"vi": "File review (CSV, 41 cột)", "ja": "レビューファイル（CSV、41列）"},
+    "candidates.route_label": {"vi": "Đường dùng (A13)", "ja": "投与経路（A13）"},
+    "candidates.suspect_checkbox": {
+        "vi": "Chỉ candidate có病名疑い (S)", "ja": "病名疑い（S）がある候補のみ",
+    },
     # ---- Trang "Chi tiết ứng viên" (Block 6) --------------------------------
     "detail.no_candidate_selected": {"vi": "Chưa chọn candidate_id.", "ja": "candidate_idが選択されていません。"},
     "detail.link_back_to_list": {"vi": "➜ Quay lại danh sách ứng viên", "ja": "➜ 候補一覧に戻る"},
@@ -768,6 +961,40 @@ _STRINGS: dict[str, dict[str, str]] = {
         "vi": "⬇ Xuất Review Template trống (1 dòng)",
         "ja": "⬇ 空のReview Templateを出力（1行）",
     },
+    # ---- model v1.3.1, dùng thật bởi 4_Chi_tiet_benh_nhan.py ----------------
+    "detail.metric_month_range": {"vi": "Tháng đầu/cuối", "ja": "開始/終了月"},
+    "detail.metric_months_count": {"vi": "Số tháng liên tục", "ja": "連続月数"},
+    "detail.drug_v131_header": {
+        "vi": "Thuốc kháng sinh tiêm/truyền (A11-A12)", "ja": "注射・点滴抗菌薬（A11-A12）",
+    },
+    "detail.drug_name_label": {"vi": "**Tên thuốc:**", "ja": "**薬剤名：**"},
+    "detail.drug_code_label": {"vi": "**Mã thuốc:**", "ja": "**薬剤コード：**"},
+    "detail.diagnosis_v131_header": {
+        "vi": "病名 gắn vào candidate (A14-A16)", "ja": "候補に紐づく病名（A14-A16）",
+    },
+    "detail.diagnosis_state_caption": {
+        "vi": "Mỗi病名 có 1 trạng thái D1 riêng (A=確定/活動性, S=疑い) — hiển thị tách biệt, không gộp.",
+        "ja": "各病名はD1固有の状態（A=確定/活動性、S=疑い）を持ち、合算せず別々に表示します。",
+    },
+    "detail.no_diagnosis_v131_caption": {
+        "vi": "Không có病名 nào được gắn trong khung thời gian của candidate này.",
+        "ja": "この候補の期間には病名が紐づいていません。",
+    },
+    "detail.evidence_v131_header": {"vi": "Evidence reference (A17)", "ja": "エビデンス参照（A17）"},
+    "detail.progress_not_reviewed": {"vi": "Chưa rà soát", "ja": "未確認"},
+    "detail.progress_in_review": {"vi": "Đang rà soát", "ja": "確認中"},
+    "detail.progress_reviewed": {"vi": "Đã xem", "ja": "確認済"},
+    "detail.review_data_v131_header": {
+        "vi": "Dữ liệu review đã upload cho candidate này", "ja": "この候補にアップロードされたレビューデータ",
+    },
+    "detail.no_review_match_caption": {
+        "vi": "Chưa có dòng review nào khớp candidate_id này trong file đã upload.",
+        "ja": "アップロードしたファイルにこのcandidate_idに一致する行がありません。",
+    },
+    "detail.download_review_v131_button": {
+        "vi": "⬇ Tải file review (41 cột, A đã điền, B/C trống) cho candidate này",
+        "ja": "⬇ この候補のレビューファイルをダウンロード（41列、A記入済み、B/C空欄）",
+    },
     # ---- Trang "Xuất dữ liệu" (Block 7) -------------------------------------
     "export.title": {"vi": "Xuất dữ liệu (Block 7)", "ja": "データ出力（Block 7）"},
     "export.draft_warning": {
@@ -808,6 +1035,49 @@ _STRINGS: dict[str, dict[str, str]] = {
     },
     "export.upload_header": {"vi": "⬆ Nạp 07/08 đã điền (chỉ đọc)", "ja": "⬆ 記入済み 07/08 を読み込む（読み取り専用）"},
     "export.loaded_generic_msg": {"vi": "Đã nạp {n} dòng.", "ja": "{n}行を読み込みました。"},
+    # ---- model v1.3.1, dùng thật bởi 5_Xuat_du_lieu.py ----------------------
+    "export.create_csv_button": {"vi": "🔄 Tạo file CSV", "ja": "🔄 CSVファイルを作成"},
+    "export.not_created_info": {
+        "vi": "Bấm 'Tạo file CSV' ở trên để tạo file tải xuống cho lần chạy hiện tại.",
+        "ja": "上の「CSVファイルを作成」を押すと、今回の実行結果のダウンロードファイルを作成します。",
+    },
+    "export.dl_candidate_v131_button": {
+        "vi": "⬇ Candidate (17 cột A, chỉ tool)", "ja": "⬇ 候補（Aの17列のみ、ツール出力）",
+    },
+    "export.dl_review_v131_button": {
+        "vi": "⬇ File review (41 cột, A đã điền + B/C trống)",
+        "ja": "⬇ レビューファイル（41列、A記入済み＋B/C空欄）",
+    },
+    "export.col_dict_caption": {
+        "vi": "📖 File riêng giải thích ý nghĩa 41 cột bằng tiếng Nhật, lấy nguyên văn từ "
+              "CSV設計説明書v1.3.1 §4 — không tự dịch/diễn giải lại (CLAUDE.md mục 3).",
+        "ja": "📖 41列それぞれの意味を日本語で説明する別ファイルです。CSV設計説明書v1.3.1 §4の原文のまま"
+              "であり、独自に翻訳・解釈し直してはいません（CLAUDE.md 第3項）。",
+    },
+    "export.dl_col_dict_button": {
+        "vi": "⬇ Từ điển cột (column_dictionary.csv, 41 dòng)", "ja": "⬇ 列の説明（column_dictionary.csv、41行）",
+    },
+    "export.qc_upload_header": {
+        "vi": "Upload file review đã điền để kiểm tra (V01-V09)",
+        "ja": "記入済みレビューファイルをアップロードしてチェック（V01-V09）",
+    },
+    "export.qc_caption": {
+        "vi": "Điểm kiểm tra chỉ tìm lỗi nhập liệu (CSV設計説明書v1.3.1 §7) — không đánh giá case_status/Day0/"
+              "転帰 có ĐÚNG hay không, chỉ xem có NHẤT QUÁN hay không. Người二次確認 (C01/C02) vẫn là người quyết.",
+        "ja": "このチェックは入力ミスのみを検出します（CSV設計説明書v1.3.1 §7）— case_status/Day0/転帰が"
+              "正しいかどうかは判定せず、一貫しているかどうかのみを見ます。二次確認（C01/C02）は引き続き人が"
+              "判断します。",
+    },
+    "export.qc_no_issues": {
+        "vi": "Không phát hiện vấn đề nào qua V01-V09.", "ja": "V01-V09でのチェックで問題は見つかりませんでした。",
+    },
+    "export.qc_issues_warning": {
+        "vi": "{n} dòng có vấn đề — {n_error} lỗi (エラー), {n_warn} cảnh báo (警告).",
+        "ja": "{n}行に問題があります — エラー{n_error}件、警告{n_warn}件。",
+    },
+    "export.qc_col_row": {"vi": "dòng", "ja": "行"},
+    "export.qc_col_level": {"vi": "mức", "ja": "レベル"},
+    "export.qc_col_content": {"vi": "nội dung", "ja": "内容"},
     # ---- Cột dùng chung ----------------------------------------------------
     "col.order": {"vi": "Thứ tự", "ja": "順序"},
     "col.id": {"vi": "Mã", "ja": "ID"},
